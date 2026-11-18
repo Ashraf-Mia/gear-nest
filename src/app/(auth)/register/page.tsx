@@ -9,7 +9,8 @@ import { FaFacebook } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/toast";
+// Changed: use Sonner's toast helper so the mounted Sonner <Toaster /> displays the notifications.
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
 export default function RegisterPage() {
@@ -31,45 +32,35 @@ export default function RegisterPage() {
     };
 
     if (user.password !== user.confirmPassword) {
-      toast.add({
-        type: "Warning",
-        title: "Passwords don't match",
+      toast.warning("Passwords don't match", {
         description: "Password and confirm password must be the same.",
       });
       return;
     }
 
     if (user.password.length < 8) {
-      toast.add({
-        type: "Warning",
-        title: "Password too short",
+      toast.warning("Password too short", {
         description: "Your password must be at least 8 characters long.",
       });
       return;
     }
 
     if (!/[A-Z]/.test(user.password)) {
-      toast.add({
-        type: "Warning",
-        title: "Weak password",
+      toast.warning("Weak password", {
         description: "Include at least one uppercase letter (A-Z).",
       });
       return;
     }
 
     if (!/[a-z]/.test(user.password)) {
-      toast.add({
-        type: "Warning",
-        title: "Weak password",
+      toast.warning("Weak password", {
         description: "Include at least one lowercase letter (a-z).",
       });
       return;
     }
 
     if (!/[0-9]/.test(user.password)) {
-      toast.add({
-        type: "Warning",
-        title: "Weak password",
+      toast.warning("Weak password", {
         description: "Include at least one number (0-9).",
       });
       return;
@@ -83,18 +74,14 @@ export default function RegisterPage() {
     });
 
     if (error) {
-      toast.add({
-        type: "Warning",
-        title: "Sign up failed",
+      toast.warning("Sign up failed", {
         description: error.message || "Something went wrong. Try again.",
       });
       return;
     }
 
     if (data) {
-      toast.add({
-        type: "Success",
-        title: "Welcome!",
+      toast.success("Welcome!", {
         description: "Your account has been created successfully.",
       });
       router.push("/");

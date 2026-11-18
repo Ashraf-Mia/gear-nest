@@ -9,7 +9,8 @@ import { FaFacebook } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/toast";
+// Changed: use Sonner's toast helper so the mounted Sonner <Toaster /> displays the notifications.
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
@@ -31,18 +32,14 @@ export default function LoginPage() {
     });
 
     if (error) {
-      toast.add({
-        type: "Warning",
-        title: "Login failed",
+      toast.warning("Login failed", {
         description: "Invalid email or password.",
       });
       return;
     }
 
     if (data) {
-      toast.add({
-        type: "Success",
-        title: "Welcome back!",
+      toast.success("Welcome back!", {
         description: "You have logged in successfully.",
       });
       router.push("/");

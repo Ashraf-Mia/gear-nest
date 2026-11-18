@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import ThemeToggle from "@/components/shared/theme-toggle";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { authClient } from "@/lib/auth-client";
+// Changed: use Sonner's toast helper (the Sonner <Toaster /> is mounted in the root layout).
+import { toast } from "sonner";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -22,12 +34,97 @@ const loginStyle = buttonVariants({
     "bg-transparent text-white border-white/30 hover:bg-white/10 hover:text-white",
 });
 
+// Changed: reusable account dropdown used by both the desktop and mobile navbars.
+// Clicking outside the menu (or pressing Escape) closes it automatically.
+function AccountMenu({
+  user,
+  onLogout,
+  triggerClassName,
+  children,
+}: {
+  user: { name: string; email: string; image?: string | null };
+  onLogout: () => void;
+  triggerClassName: string;
+  children: ReactNode;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className={triggerClassName}>
+        {children}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        side="bottom"
+        sideOffset={8}
+        className="w-64"
+      >
+        <div className="flex items-center gap-3 p-1.5">
+          <Avatar className="size-10">
+            <AvatarImage src={user.image || undefined} alt={user.name} />
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              {user.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{user.name}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {user.email}
+            </p>
+          </div>
+        </div>
+
+        <DropdownMenuSeparator />
+
+        {/* Changed: placeholder links, as requested (profile/dashboard pages are not created yet). */}
+        <DropdownMenuItem render={<Link href="/#" />}>
+          <UserRound className="size-4" />
+          Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem render={<Link href="/#" />}>
+          <LayoutDashboard className="size-4" />
+          Dashboard
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem variant="destructive" onClick={onLogout}>
+          <LogOut className="size-4" />
+          Log Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  // Changed: router is used to refresh the page after logging out.
+  const router = useRouter();
+  // Changed: read the real logged-in user from Better Auth instead of the hard-coded `false`.
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
 
-  // TODO: অথ বসানোর পর এখানে আসল ইউজার চেক হবে
-  const isLoggedIn = false;
+  // Changed: new logout handler that signs the user out and refreshes the session.
+  const handleLogout = async () => {
+    const { error } = await authClient.signOut();
+
+    if (error) {
+      toast.error("Log out failed", {
+        description: error.message || "Something went wrong. Try again.",
+      });
+      return;
+    }
+
+    setMenuOpen(false);
+
+    toast.success("Logged out", {
+      description: "You have been logged out successfully.",
+    });
+
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-navy-dark text-white">
@@ -61,12 +158,28 @@ export default function Navbar() {
           <ThemeToggle />
 
           <div className="hidden items-center gap-2 lg:flex">
-            {isLoggedIn ? (
+            {isPending ? null : user ? (
+              // Changed: logged-in desktop view now shows the user's avatar and a logout button.
               <>
-                <Link href="/dashboard" className={loginStyle}>
-                  Dashboard
-                </Link>
-                <Button>Logout</Button>
+                <AccountMenu
+                  user={user}
+                  onLogout={handleLogout}
+                  triggerClassName="cursor-pointer rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <Avatar className="size-9 border border-white/20">
+                    <AvatarImage
+                      src={user.image || undefined}
+                      alt={user.name}
+                    />
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </AccountMenu>
+                <Button variant="destructive" onClick={handleLogout}>
+                  <LogOut className="size-4" />
+                  Log Out
+                </Button>
               </>
             ) : (
               <>
@@ -107,13 +220,41 @@ export default function Navbar() {
             ))}
 
             <div className="mt-3 flex gap-2">
-              {isLoggedIn ? (
-                <Link
-                  href="/dashboard"
-                  className={buttonVariants({ className: "flex-1" })}
-                >
-                  Dashboard
-                </Link>
+              {isPending ? null : user ? (
+                // Changed: logged-in mobile view now shows the avatar/user info and a logout button.
+                <>
+                  <AccountMenu
+                    user={user}
+                    onLogout={handleLogout}
+                    triggerClassName="flex min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-md border border-white/20 px-3 py-2 text-left"
+                  >
+                    <Avatar className="size-8 border border-white/20">
+                      <AvatarImage
+                        src={user.image || undefined}
+                        alt={user.name}
+                      />
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium">
+                        {user.name}
+                      </span>
+                      <span className="block truncate text-xs text-slate-400">
+                        {user.email}
+                      </span>
+                    </span>
+                  </AccountMenu>
+                  <Button
+                    variant="destructive"
+                    className="shrink-0"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="size-4" />
+                    Log Out
+                  </Button>
+                </>
               ) : (
                 <>
                   <Link
