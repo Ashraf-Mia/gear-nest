@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+// import Navbar from "@/components/shared/navbar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
