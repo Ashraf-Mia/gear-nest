@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 
-// Changed: use Sonner's toaster so toasts can be positioned at the top-center.
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-// import Navbar from "@/components/shared/navbar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -39,7 +37,6 @@ export default function RootLayout({
         >
           {children}
 
-          {/* Changed: toasts now appear at the top-center of the screen. */}
           <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>

@@ -9,9 +9,10 @@ import { FaFacebook } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-// Changed: use Sonner's toast helper so the mounted Sonner <Toaster /> displays the notifications.
+
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { TRegisterForm } from "@/types";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,14 +24,7 @@ export default function RegisterPage() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const user = Object.fromEntries(formData.entries()) as {
-      name: string;
-      email: string;
-      image: string;
-      password: string;
-      confirmPassword: string;
-    };
-
+    const user = Object.fromEntries(formData.entries()) as TRegisterForm;
     if (user.password !== user.confirmPassword) {
       toast.warning("Passwords don't match", {
         description: "Password and confirm password must be the same.",

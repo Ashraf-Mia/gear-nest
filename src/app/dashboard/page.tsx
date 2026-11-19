@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
-    if (isPending) return; // লোড শেষ না হওয়া পর্যন্ত কিছু করবো না (রিলোডে লগইনে পাঠানো আটকায়)
+    if (isPending) return;
 
     if (!session) {
       router.replace("/login");

@@ -20,18 +20,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authClient } from "@/lib/auth-client";
 import { menus, Role } from "@/lib/menus";
-// import { menus, Role } from "@/lib/menus";
 
 export default function AppSidebar() {
-  const pathname = usePathname(); // এখন কোন পেজে আছি
+  const pathname = usePathname();
   const router = useRouter();
-  const { setOpenMobile } = useSidebar(); // মোবাইলে লিংকে ক্লিক করলে মেনু বন্ধ করার জন্য
+  const { setOpenMobile } = useSidebar();
 
-  // লগইন করা ইউজারের তথ্য
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  // ইউজারের রোল (না পেলে customer ধরা হবে)
   const role = ((user as { role?: string } | undefined)?.role ??
     "customer") as Role;
   const menuItems = menus[role] ?? menus.customer;
@@ -44,7 +41,6 @@ export default function AppSidebar() {
 
   return (
     <Sidebar>
-      {/* ১. ওপরে লোগো */}
       <SidebarHeader className="border-b border-sidebar-border p-4">
         <Link href="/">
           <Image
@@ -57,7 +53,6 @@ export default function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-      {/* ২. মাঝখানে মেনু (রোল অনুযায়ী) */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="capitalize text-slate-400">
@@ -86,7 +81,6 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* হোম পেজে ফেরার লিংক */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -101,7 +95,6 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* ৩. নিচে ইউজারের ছবি, নাম ও Logout */}
       <SidebarFooter className="border-t border-sidebar-border p-3">
         <div className="flex items-center gap-3 px-1 py-2">
           <Avatar className="size-9">

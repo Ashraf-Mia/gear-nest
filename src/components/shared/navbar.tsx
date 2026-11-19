@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authClient } from "@/lib/auth-client";
-// Changed: use Sonner's toast helper (the Sonner <Toaster /> is mounted in the root layout).
+
 import { toast } from "sonner";
 
 const navLinks = [
@@ -34,8 +34,6 @@ const loginStyle = buttonVariants({
     "bg-transparent text-white border-white/30 hover:bg-white/10 hover:text-white",
 });
 
-// Changed: reusable account dropdown used by both the desktop and mobile navbars.
-// Clicking outside the menu (or pressing Escape) closes it automatically.
 function AccountMenu({
   user,
   onLogout,
@@ -75,7 +73,6 @@ function AccountMenu({
 
         <DropdownMenuSeparator />
 
-        {/* Changed: placeholder links, as requested (profile/dashboard pages are not created yet). */}
         <DropdownMenuItem render={<Link href="/#" />}>
           <UserRound className="size-4" />
           Profile
@@ -99,13 +96,12 @@ function AccountMenu({
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  // Changed: router is used to refresh the page after logging out.
+
   const router = useRouter();
-  // Changed: read the real logged-in user from Better Auth instead of the hard-coded `false`.
+
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  // Changed: new logout handler that signs the user out and refreshes the session.
   const handleLogout = async () => {
     const { error } = await authClient.signOut();
 
@@ -159,7 +155,6 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-2 lg:flex">
             {isPending ? null : user ? (
-              // Changed: logged-in desktop view now shows the user's avatar and a logout button.
               <>
                 <AccountMenu
                   user={user}
@@ -221,7 +216,6 @@ export default function Navbar() {
 
             <div className="mt-3 flex gap-2">
               {isPending ? null : user ? (
-                // Changed: logged-in mobile view now shows the avatar/user info and a logout button.
                 <>
                   <AccountMenu
                     user={user}
