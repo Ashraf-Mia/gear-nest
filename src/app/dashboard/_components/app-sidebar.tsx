@@ -34,7 +34,7 @@ export default function AppSidebar() {
   // ইউজারের রোল (না পেলে customer ধরা হবে)
   const role = ((user as { role?: string } | undefined)?.role ??
     "customer") as Role;
-  const menuItems = menus[role] ?? menus.equipment;
+  const menuItems = menus[role] ?? menus.customer;
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -48,7 +48,7 @@ export default function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border p-4">
         <Link href="/">
           <Image
-            src="/images/white-logo.png"
+            src="/images/nevi-logo.png"
             alt="GearNest"
             width={150}
             height={40}
@@ -114,7 +114,7 @@ export default function AppSidebar() {
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-white">
+            <p className="truncate text-sm font-medium text-slate-900">
               {user?.name ?? "Loading..."}
             </p>
             <p className="truncate text-xs text-slate-400">{user?.email}</p>

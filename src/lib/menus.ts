@@ -10,14 +10,14 @@ import {
 } from "lucide-react";
 
 export const menus = {
-  equipment: [
+  customer: [
     {
       label: "My Rentals",
-      href: "/dashboard/equipment/rentals",
+      href: "/dashboard/customer/rentals",
       icon: ClipboardList,
     },
-    { label: "Favorites", href: "/dashboard/equipment/favorites", icon: Heart },
-    { label: "Profile", href: "/dashboard/equipment/profile", icon: User },
+    { label: "Favorites", href: "/dashboard/customer/favorites", icon: Heart },
+    { label: "Profile", href: "/dashboard/customer/profile", icon: User },
   ],
   owner: [
     { label: "Analytics", href: "/dashboard/owner/analytics", icon: BarChart3 },
@@ -55,4 +55,4 @@ export const menus = {
   ],
 };
 
-export type Role = keyof typeof menus; // "equipment" | "owner" | "admin"
+export type Role = keyof typeof menus; // "customer" | "owner" | "admin"

@@ -20,7 +20,7 @@ export default function DashboardPage() {
 
     const role = ((session.user as { role?: string }).role ??
       "customer") as Role;
-    router.replace((menus[role] ?? menus.equipment)[0].href);
+    router.replace((menus[role] ?? menus.customer)[0].href);
   }, [session, isPending, router]);
 
   return <p className="text-muted-foreground">Loading dashboard...</p>;
