@@ -73,6 +73,8 @@ export default function RegisterPage() {
       password: user.password,
     });
 
+    console.log({ data, error });
+
     if (error) {
       toast.warning("Sign up failed", {
         description: error.message || "Something went wrong. Try again.",

@@ -9,7 +9,7 @@ import { FaFacebook } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-// Changed: use Sonner's toast helper so the mounted Sonner <Toaster /> displays the notifications.
+
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 

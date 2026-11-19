@@ -80,7 +80,7 @@ function AccountMenu({
           <UserRound className="size-4" />
           Profile
         </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/#" />}>
+        <DropdownMenuItem render={<Link href="/dashboard" />}>
           <LayoutDashboard className="size-4" />
           Dashboard
         </DropdownMenuItem>
