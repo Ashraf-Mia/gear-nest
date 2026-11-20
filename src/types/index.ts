@@ -1,6 +1,5 @@
 export type TRole = "customer" | "owner" | "admin";
 
-// Users can register as a customer or an owner, but never as an admin.
 export type TRegisterRole = Exclude<TRole, "admin">;
 
 export type TRegisterForm = {
@@ -10,4 +9,27 @@ export type TRegisterForm = {
   role: TRegisterRole;
   password: string;
   confirmPassword: string;
+};
+
+export type TEquipmentStatus = "pending" | "approved" | "rejected";
+
+export type TEquipment = {
+  _id: string;
+  name: string;
+  description: string;
+  category: string;
+  location: string;
+  brand: string;
+  model: string;
+  rentalPrice: number;
+  rentalType: string;
+  availableQuantity: number;
+  condition: string;
+  image: string;
+  rentalTerms: string;
+  ownerId: string;
+  ownerName: string;
+  ownerEmail: string;
+  status: TEquipmentStatus;
+  createdAt: string;
 };

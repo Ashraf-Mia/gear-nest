@@ -31,13 +31,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { createEquipment } from "@/lib/api/equipment";
+import { uploadImage } from "@/lib/api/upload";
 import {
   EQUIPMENT_CATEGORIES,
   EQUIPMENT_CONDITIONS,
   RENTAL_TYPES,
 } from "@/lib/equipment-options";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const selectClass =
   "h-11 w-full appearance-none rounded-lg border border-input bg-card px-3 pr-9 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50";
@@ -108,23 +108,11 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
     setIsUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.url) {
-        throw new Error(data.error || "ImgBB did not return an image URL.");
-      }
+      const url = await uploadImage(file);
 
       // Store the hosted URL. This is what gets saved with the equipment.
-      setImageUrl(data.url);
-      setImagePreview(data.url);
+      setImageUrl(url);
+      setImagePreview(url);
 
       toast.success("Image uploaded", {
         description: "Your equipment photo is ready.",
@@ -179,7 +167,18 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
     const formData = new FormData(form);
 
     const payload = {
-      ...Object.fromEntries(formData.entries()),
+      name: String(formData.get("name") ?? ""),
+      description: String(formData.get("description") ?? ""),
+      category: String(formData.get("category") ?? ""),
+      location: String(formData.get("location") ?? ""),
+      brand: String(formData.get("brand") ?? ""),
+      model: String(formData.get("model") ?? ""),
+      rentalPrice: Number(formData.get("rentalPrice")),
+      rentalType: String(formData.get("rentalType") ?? ""),
+      availableQuantity: Number(formData.get("availableQuantity")),
+      condition: String(formData.get("condition") ?? ""),
+      image: imageUrl,
+      rentalTerms: String(formData.get("rentalTerms") ?? ""),
       ownerId: owner.id,
       ownerName: owner.name,
       ownerEmail: owner.email,
@@ -188,15 +187,7 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_URL}/equipment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error("Could not submit the equipment. Please try again.");
-      }
+      await createEquipment(payload);
 
       toast.success("Equipment submitted", {
         description: "Your listing is now pending admin approval.",
