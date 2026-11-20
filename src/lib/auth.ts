@@ -26,8 +26,6 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
-          // Registration can only create customers or owners. Even a direct
-          // API request cannot register a new admin account.
           const role = user.role === "owner" ? "owner" : "customer";
 
           return { data: { ...user, role } };
@@ -35,10 +33,21 @@ export const auth = betterAuth({
       },
     },
   },
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "facebook"],
+      allowDifferentEmails: false,
+    },
+  },
   socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+    facebook: {
+      clientId: process.env.FACEBOOK_CLIENT_ID as string,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
     },
   },
 });
