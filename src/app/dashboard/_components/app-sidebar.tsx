@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authClient } from "@/lib/auth-client";
+import { clearTokenCache } from "@/lib/getTokenFromClient";
 import { menus, Role } from "@/lib/menus";
 
 export default function AppSidebar() {
@@ -35,6 +36,8 @@ export default function AppSidebar() {
 
   const handleLogout = async () => {
     await authClient.signOut();
+    // Forget the saved JWT of the user who just logged out.
+    clearTokenCache();
     router.push("/login");
     router.refresh();
   };

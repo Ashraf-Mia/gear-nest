@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  Eye,
   Loader2,
   PackageOpen,
   PackagePlus,
@@ -11,7 +12,9 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import DeleteEquipmentDialog from "@/components/equipment/delete-equipment-dialog";
+import EquipmentStatusBadge from "@/components/equipment/equipment-status-badge";
+import UpdateEquipmentDialog from "@/components/equipment/update-equipment-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -38,32 +41,8 @@ import {
 } from "@/components/ui/table";
 import { getOwnerEquipment } from "@/lib/api/equipment";
 import { authClient } from "@/lib/auth-client";
-import type { TEquipment, TEquipmentStatus } from "@/types";
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
-
-const RENTAL_PERIODS: Record<string, string> = {
-  Daily: "day",
-  Weekly: "week",
-  Monthly: "month",
-};
-
-const statusStyles: Record<TEquipmentStatus, string> = {
-  pending:
-    "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  approved:
-    "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  rejected: "border-destructive/30 bg-destructive/10 text-destructive",
-};
-
-function formatPrice(price: number) {
-  const amount = Number(price);
-
-  return Number.isFinite(amount) ? currencyFormatter.format(amount) : "—";
-}
+import { formatPrice, getRentalPeriod } from "@/lib/format";
+import type { TEquipment } from "@/types";
 
 export default function OwnerMyEquipmentPage() {
   const { data: session, isPending: isSessionPending } =
@@ -85,7 +64,9 @@ export default function OwnerMyEquipmentPage() {
       setError("");
 
       try {
-        const data = await getOwnerEquipment(owner.id);
+        // One request for the owner's list. The token is cached, so this is
+        // not fetched again on every action.
+        const data = await getOwnerEquipment();
 
         if (!isCancelled) {
           setEquipment(data);
@@ -112,6 +93,18 @@ export default function OwnerMyEquipmentPage() {
       isCancelled = true;
     };
   }, [owner?.id, reloadKey]);
+
+  // Put the updated item into the list directly. No full re-fetch.
+  const handleUpdated = (updated: TEquipment) => {
+    setEquipment((items) =>
+      items.map((item) => (item._id === updated._id ? updated : item)),
+    );
+  };
+
+  // Remove the deleted item from the list directly. No full re-fetch.
+  const handleDeleted = (id: string) => {
+    setEquipment((items) => items.filter((item) => item._id !== id));
+  };
 
   if (isSessionPending) {
     return (
@@ -222,11 +215,14 @@ export default function OwnerMyEquipmentPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Equipment</TableHead>
+                  <TableHead>Equipment Name</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Rental Price</TableHead>
-                  <TableHead className="text-center">Available</TableHead>
-                  <TableHead className="text-right">Status</TableHead>
+                  <TableHead className="text-center">
+                    Available Quantity
+                  </TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -272,9 +268,7 @@ export default function OwnerMyEquipmentPage() {
                       </span>
                       <span className="text-xs text-muted-foreground">
                         {" "}
-                        /{" "}
-                        {RENTAL_PERIODS[item.rentalType] ??
-                          item.rentalType?.toLowerCase()}
+                        / {getRentalPeriod(item.rentalType)}
                       </span>
                     </TableCell>
 
@@ -282,15 +276,34 @@ export default function OwnerMyEquipmentPage() {
                       {item.availableQuantity}
                     </TableCell>
 
+                    <TableCell>
+                      <EquipmentStatusBadge status={item.status} />
+                    </TableCell>
+
                     <TableCell className="text-right">
-                      <Badge
-                        variant="outline"
-                        className={`capitalize ${
-                          statusStyles[item.status] ?? statusStyles.pending
-                        }`}
-                      >
-                        {item.status}
-                      </Badge>
+                      <div className="flex justify-end gap-1.5">
+                        {/* View uses the one shared details page. */}
+                        <Link
+                          href={`/equipment/${item._id}`}
+                          className={buttonVariants({
+                            variant: "outline",
+                            size: "sm",
+                          })}
+                        >
+                          <Eye className="size-3.5" />
+                          View
+                        </Link>
+
+                        <UpdateEquipmentDialog
+                          equipment={item}
+                          onUpdated={handleUpdated}
+                        />
+
+                        <DeleteEquipmentDialog
+                          equipment={item}
+                          onDeleted={handleDeleted}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

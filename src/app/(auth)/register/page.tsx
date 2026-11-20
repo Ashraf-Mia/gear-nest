@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { clearTokenCache } from "@/lib/getTokenFromClient";
 import { TRegisterForm, TRegisterRole } from "@/types";
 
 const selectClass =
@@ -211,6 +212,9 @@ export default function RegisterPage() {
     }
 
     if (data) {
+      // Start fresh with the new account's token.
+      clearTokenCache();
+
       toast.success("Welcome!", {
         description: "Your account has been created successfully.",
       });

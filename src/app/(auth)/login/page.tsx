@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { clearTokenCache } from "@/lib/getTokenFromClient";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,6 +40,9 @@ export default function LoginPage() {
     }
 
     if (data) {
+      // Make sure we do not reuse an old user's cached token.
+      clearTokenCache();
+
       toast.success("Welcome back!", {
         description: "You have logged in successfully.",
       });

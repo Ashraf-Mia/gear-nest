@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authClient } from "@/lib/auth-client";
+import { clearTokenCache } from "@/lib/getTokenFromClient";
 
 import { toast } from "sonner";
 
@@ -111,6 +112,9 @@ export default function Navbar() {
       });
       return;
     }
+
+    // Forget the saved JWT of the user who just logged out.
+    clearTokenCache();
 
     setMenuOpen(false);
 
