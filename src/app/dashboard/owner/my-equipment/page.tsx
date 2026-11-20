@@ -66,7 +66,8 @@ function formatPrice(price: number) {
 }
 
 export default function OwnerMyEquipmentPage() {
-  const { data: session, isPending: isSessionPending } = authClient.useSession();
+  const { data: session, isPending: isSessionPending } =
+    authClient.useSession();
   const owner = session?.user;
 
   const [equipment, setEquipment] = useState<TEquipment[]>([]);
