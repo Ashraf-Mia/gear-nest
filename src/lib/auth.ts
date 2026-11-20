@@ -22,6 +22,19 @@ export const auth = betterAuth({
       },
     },
   },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Registration can only create customers or owners. Even a direct
+          // API request cannot register a new admin account.
+          const role = user.role === "owner" ? "owner" : "customer";
+
+          return { data: { ...user, role } };
+        },
+      },
+    },
+  },
   socialProviders: {
     github: {
       clientId: process.env.GITHUB_CLIENT_ID as string,

@@ -1,20 +1,7 @@
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-
-// ImgBB accepts images up to 32 MB, but 5 MB keeps the form fast.
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export async function POST(request: Request) {
   try {
-    // Only logged-in users can upload images.
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (!session?.user) {
-      return Response.json(
-        { error: "You must be logged in to upload an image." },
-        { status: 401 },
-      );
-    }
-
     // The API key stays on the server. It is never sent to the browser.
     const apiKey = process.env.IMGBB_API_KEY;
     if (!apiKey) {
