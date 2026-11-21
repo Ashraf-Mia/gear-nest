@@ -32,6 +32,8 @@ export type TEquipment = {
   ownerEmail: string;
   status: TEquipmentStatus;
   createdAt: string;
+  price: number; // Added price field for calculateTotal function
+  quantity: number; // Added quantity field for validation in booking modal
 };
 
 // Shape of the paginated response from GET /equipment.

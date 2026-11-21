@@ -22,6 +22,7 @@ import { checkFavorite, toggleFavorite } from "@/lib/api/favorites";
 import { authClient } from "@/lib/auth-client";
 import { getTokenFromClient } from "@/lib/getTokenFromClient";
 import type { TEquipment, TEquipmentStatus } from "@/types";
+import BookingModal from "@/components/equipment/booking-modal";
 
 export default function EquipmentDetailsClient({ id }: { id: string }) {
   const router = useRouter();
@@ -33,6 +34,7 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   // Favorite state is kept separate from the equipment so the heart button can
   // update instantly without reloading the whole page. The equipment id is
@@ -317,7 +319,11 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
                         ? "Remove from Favorites"
                         : "Add to Favorites"}
                     </Button>
-                    <Button type="button" onClick={handleBook}>
+                    <Button
+                      type="button"
+                      onClick={() => setBookingOpen(true)}
+                      disabled={equipment.quantity < 1}
+                    >
                       Book Now
                     </Button>
                   </>
@@ -331,6 +337,11 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
           )}
         </CardContent>
       </Card>
+      <BookingModal
+        item={equipment}
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+      />
     </div>
   );
 }
