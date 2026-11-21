@@ -1,5 +1,6 @@
 // import { API_URL, getToken } from "@/lib/api";
 
+import { TBooking } from "@/types";
 import { getTokenFromClient } from "../getTokenFromClient";
 import { API_URL } from "./config";
 
@@ -84,4 +85,19 @@ export async function confirmPayment(sessionId: string) {
   }
 
   return result as { success: boolean; transactionId: string; amount: number };
+}
+
+// লগইন করা customer-এর সব booking আনে
+export async function getMyBookings(): Promise<TBooking[]> {
+  const token = await getTokenFromClient();
+
+  const response = await fetch(`${API_URL}/bookings/my`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not load your rentals. Please try again.");
+  }
+
+  return response.json();
 }

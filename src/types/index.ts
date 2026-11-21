@@ -12,6 +12,9 @@ export type TRegisterForm = {
 };
 
 export type TEquipmentStatus = "pending" | "approved" | "rejected";
+export type RentalType = "daily" | "weekly" | "monthly";
+export type PaymentStatus = "pending" | "paid" | "failed";
+export type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
 
 export type TEquipment = {
   _id: string;
@@ -40,4 +43,23 @@ export type EquipmentResponse = {
   total: number;
   page: number;
   totalPages: number;
+};
+
+export type TBooking = {
+  _id: string;
+  equipmentId: string;
+  equipmentName: string;
+  customerEmail: string;
+  ownerEmail: string;
+  startDate: string;
+  endDate: string;
+  quantity: number;
+  totalAmount: number;
+  contact: string;
+  address: string;
+  notes?: string;
+  paymentStatus: PaymentStatus;
+  bookingStatus: BookingStatus;
+  createdAt: string;
+  customerName?: string;
 };
