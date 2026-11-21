@@ -2,13 +2,11 @@
 // (so the server can reject values that are not in the list).
 export const EQUIPMENT_CATEGORIES: string[] = [
   "Construction Equipment",
-  "Power Tools",
-  "Garden & Landscaping",
-  "Cleaning Equipment",
-  "Lifting & Access",
-  "Audio & Visual",
-  "Event & Party",
-  "Automotive",
+  "Photography Equipment",
+  "Vehicles & Transportation",
+  "Agriculture Equipment",
+  "Electronics",
+  "Event Equipment",
   "Other",
 ];
 

@@ -10,7 +10,13 @@ import DeleteEquipmentDialog from "@/components/equipment/delete-equipment-dialo
 import EquipmentDetails from "@/components/equipment/equipment-details";
 import UpdateEquipmentDialog from "@/components/equipment/update-equipment-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getEquipmentById, updateEquipmentStatus } from "@/lib/api/equipment";
 import { authClient } from "@/lib/auth-client";
 import { getTokenFromClient } from "@/lib/getTokenFromClient";
@@ -180,9 +186,7 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
               />
               <DeleteEquipmentDialog
                 equipment={equipment}
-                onDeleted={() =>
-                  router.push("/dashboard/owner/my-equipment")
-                }
+                onDeleted={() => router.push("/dashboard/owner/my-equipment")}
               />
             </>
           )}
@@ -192,9 +196,7 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
               <Button
                 type="button"
                 onClick={() => handleStatusChange("approved")}
-                disabled={
-                  isUpdatingStatus || equipment.status === "approved"
-                }
+                disabled={isUpdatingStatus || equipment.status === "approved"}
               >
                 Approve
               </Button>
@@ -202,9 +204,7 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
                 type="button"
                 variant="destructive"
                 onClick={() => handleStatusChange("rejected")}
-                disabled={
-                  isUpdatingStatus || equipment.status === "rejected"
-                }
+                disabled={isUpdatingStatus || equipment.status === "rejected"}
               >
                 Reject
               </Button>
