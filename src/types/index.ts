@@ -33,3 +33,11 @@ export type TEquipment = {
   status: TEquipmentStatus;
   createdAt: string;
 };
+
+// Shape of the paginated response from GET /equipment.
+export type EquipmentResponse = {
+  equipment: TEquipment[];
+  total: number;
+  page: number;
+  totalPages: number;
+};

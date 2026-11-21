@@ -1,4 +1,8 @@
-import type { TEquipment, TEquipmentStatus } from "@/types";
+import type {
+  EquipmentResponse,
+  TEquipment,
+  TEquipmentStatus,
+} from "@/types";
 
 import { API_URL } from "./config";
 
@@ -12,15 +16,61 @@ export type TEquipmentUpdate = Pick<
   "name" | "category" | "rentalPrice" | "availableQuantity"
 >;
 
-// The public list only contains approved equipment.
-export async function getEquipment(): Promise<TEquipment[]> {
-  const response = await fetch(`${API_URL}/equipment`);
+// The public list only contains approved equipment. The endpoint is
+// paginated, so it returns the same object shape as `getEquipmentList`.
+export async function getEquipment(): Promise<EquipmentResponse> {
+  return getEquipmentList();
+}
+
+// Filters the public equipment list accepts. All values are optional; empty
+// ones are left out of the request so the server sees no filter at all.
+export type TEquipmentQuery = {
+  search?: string;
+  category?: string;
+  rentalType?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  availability?: string;
+  sort?: string;
+  page?: number;
+  limit?: number;
+};
+
+// Paginated public list used by the "All Equipment" page. Keeping the request
+// here means the page only handles state and rendering, like the other pages.
+export async function getEquipmentList(
+  query: TEquipmentQuery = {},
+): Promise<EquipmentResponse> {
+  const params = new URLSearchParams();
+
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") {
+      params.set(key, String(value));
+    }
+  });
+
+  const response = await fetch(`${API_URL}/equipment?${params.toString()}`);
 
   if (!response.ok) {
     throw new Error("Could not load equipment. Please try again.");
   }
 
-  return response.json();
+  const data = await response.json();
+
+  // Guard against an unexpected payload (for example a bare array from an
+  // older API). Without this check the page would crash while reading
+  // `equipment.length` on undefined.
+  if (!data || !Array.isArray(data.equipment)) {
+    throw new Error("The server returned an unexpected response.");
+  }
+
+  // Fill in the pagination values so the UI never renders `undefined`.
+  return {
+    equipment: data.equipment,
+    total: Number(data.total) || data.equipment.length,
+    page: Number(data.page) || 1,
+    totalPages: Number(data.totalPages) || 1,
+  };
 }
 
 // One shared details endpoint. A token is optional: we only need it to see
