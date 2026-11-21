@@ -101,7 +101,8 @@ src/
       layout.tsx                         # sidebar shell (NOT yet auth-guarded)
       page.tsx                           # redirects by role
       _components/app-sidebar.tsx
-      customer/{rentals,favorites,profile}   # placeholders
+      customer/rentals, customer/profile     # placeholders
+      customer/favorites                     # saved equipment table (implemented)
       owner/{add-equipment,my-equipment,rentals,analytics,profile}
       admin/{users,equipment,rentals,analytics,profile}  # placeholders
     api/auth/[...all]/route.ts           # Better Auth handler
@@ -113,7 +114,7 @@ src/
                update-equipment-dialog,delete-equipment-dialog}.tsx
     ui/*                                 # shadcn primitives
   lib/
-    api/{config,equipment,upload}.ts      # API layer pattern to follow
+    api/{config,equipment,favorites,upload}.ts      # API layer pattern to follow
     auth.ts, auth-client.ts               # Better Auth server/client
     getTokenFromClient.ts                 # cached JWT for browser calls
     getTokenFromServer.ts                 # JWT for server components
@@ -122,7 +123,7 @@ src/
   types/index.ts                          # shared types
 ```
 
-**Server (`index.js`) currently contains:** connection + collections, `verifyToken`, `verifyAdmin`, `verifyOwner`, `verifyRenter`, optional-token helper, equipment routes, profile route, users route, and a startup normalization for legacy numeric fields. No bookings, favorites, payments, analytics, or Stripe yet.
+**Server (`index.js`) currently contains:** connection + collections, JWT/role middleware, helpers, equipment routes, favorites routes, profile route, users route, startup normalization for legacy numeric fields, and the unique favorites index. No bookings, payments, analytics, or Stripe yet.
 
 ### 2.4 Existing conventions
 
@@ -183,7 +184,7 @@ Status key: ✅ done · 🟡 partial/needs hardening · ❌ missing · ⚠️ ne
 | URL state | Filters shareable/deep-linkable | ❌ | Footer category links (`/equipment?category=...`) do nothing because the page ignores search params |
 | Details page | All required equipment + owner + terms info | ✅ | `components/equipment/equipment-details.tsx` |
 | Details privacy | Brief lists this as a **private route** | ⚠️ | Currently public; guests can open a direct URL |
-| Favorites | Add/remove on details, persisted, shown in dashboard | ❌ | No collection/API/UI |
+| Favorites | Add/remove on details, persisted, shown in dashboard | ✅ | Heart button on details (optimistic toggle + revert on error), `GET /favorites` list, `GET /favorites/check`, `POST /favorites/toggle`, `DELETE /favorites/:equipmentId` |
 | Book Now modal | Dates, quantity, contact, address, notes | ❌ | Button only shows "coming soon" toast |
 | Payment | Stripe checkout + success page + payment record | ❌ | No Stripe dependency yet |
 
@@ -192,7 +193,7 @@ Status key: ✅ done · 🟡 partial/needs hardening · ❌ missing · ⚠️ ne
 | Route | Requirement | Status |
 |---|---|---|
 | `/dashboard/customer/rentals` | Table: equipment, start, end, booking date, total, payment status, booking status | ❌ placeholder |
-| `/dashboard/customer/favorites` | Table + View Details + Remove | ❌ placeholder |
+| `/dashboard/customer/favorites` | Table + View Details + Remove | ✅ |
 | `/dashboard/customer/profile` | Name, email, image, phone, address; update | ❌ placeholder |
 
 ### 3.4 Owner dashboard
@@ -356,9 +357,10 @@ Add these (keep `{ message }` error shape and `try/catch` + `console.error`):
 | PATCH | `/users/:id/role` | Admin | Change role (`customer`/`owner`/`admin`), validate + protect last admin |
 | DELETE | `/users/:id` | Admin (optional) | Manage users; protect self/last admin |
 | GET | `/equipment/admin` | Admin | All equipment regardless of status, with filters/pagination |
-| GET | `/favorites` | Customer | Current customer's favorite equipment (populated) |
-| POST | `/favorites` | Customer | Body `{ equipmentId }`; approved equipment only |
-| DELETE | `/favorites/:equipmentId` | Customer | Remove favorite |
+| GET | `/favorites` | Customer | ✅ Current customer's favorite equipment (approved items, newest first) |
+| GET | `/favorites/check?equipmentId=` | Customer | ✅ Whether one item is saved; used by the details page on load |
+| POST | `/favorites/toggle` | Customer | ✅ Body `{ equipmentId }`; approved equipment only; returns `{ favorited }` and prevents duplicates |
+| DELETE | `/favorites/:equipmentId` | Customer | ✅ Remove favorite (idempotent) |
 | POST | `/bookings` | Customer | Validate dates/qty/availability; create `pending`/`unpaid` booking; return booking id + total |
 | GET | `/bookings/my` | Customer | Current customer's rentals (supports pagination) |
 | GET | `/bookings/owner` | Owner | Bookings for this owner's equipment |
@@ -475,9 +477,10 @@ Required sections, in order:
 ### 8.1 Favorites
 
 1. Customer clicks the heart on an approved equipment details page.
-2. `POST /favorites` inserts `{ userId, equipmentId }` (upsert/unique index prevents duplicates); UI toggles optimistically and reverts on error.
-3. Dashboard favorites list joins favorites → approved equipment; Remove calls `DELETE /favorites/:equipmentId`.
-4. Guests are redirected to login.
+2. On page load the details page calls `GET /favorites/check?equipmentId=...` so the heart is correct after a reload.
+3. `POST /favorites/toggle` uses `req.user.email` from the JWT (never a client-sent identity) and inserts/deletes `{ userEmail, equipmentId }`. The unique index on `(userEmail, equipmentId)` prevents duplicates; the UI toggles optimistically and reverts with a toast on error.
+4. The dashboard favorites page calls `GET /favorites` (approved equipment only, newest first); Remove calls `DELETE /favorites/:equipmentId`.
+5. Guests do not see the favorite button. The details route itself is still public; see §3.1 for the outstanding private-route work.
 
 ### 8.2 Booking
 
@@ -636,12 +639,12 @@ Optional items must never break required flows.
 
 ### 14.3 Server code
 
-- Plain ESM JavaScript, Express 5. Keep the existing style: small helpers at the top, routes grouped, `try/catch` on async handlers that do multiple operations, `console.error` on 500s.
+- Plain ESM JavaScript, Express 5. Keep the existing single-file style: helpers and middleware near the top, then routes grouped by resource, `try/catch` on async handlers that do multiple operations, and `console.error` on 500s.
 - Middleware order and ownership checks are mandatory; never trust ids from the client.
 - Validate enums (`status`, `role`), numeric fields, and `ObjectId` values.
-- Use the shared `equipmentCollection`/`usersCollection`; add `favoritesCollection`, `bookingsCollection`, `paymentsCollection` next to them.
+- Use the shared `equipmentCollection`, `usersCollection`, and `favoritesCollection`; add `bookingsCollection` and `paymentsCollection` next to them when those features land.
 - Keep the public list response shape `{ equipment, total, page, totalPages }`; the client depends on it.
-- If you split routes into files, update `vercel.json` accordingly. Otherwise keep `index.js` as the entry.
+- Keep `index.js` as the entry; `vercel.json` points at it.
 
 ### 14.4 Authentication and route protection
 

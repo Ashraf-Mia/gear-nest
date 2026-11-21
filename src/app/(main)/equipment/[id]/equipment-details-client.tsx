@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Heart, Loader2, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 
 import DeleteEquipmentDialog from "@/components/equipment/delete-equipment-dialog";
@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getEquipmentById, updateEquipmentStatus } from "@/lib/api/equipment";
+import { checkFavorite, toggleFavorite } from "@/lib/api/favorites";
 import { authClient } from "@/lib/auth-client";
 import { getTokenFromClient } from "@/lib/getTokenFromClient";
 import type { TEquipment, TEquipmentStatus } from "@/types";
@@ -33,8 +34,27 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
+  // Favorite state is kept separate from the equipment so the heart button can
+  // update instantly without reloading the whole page. The equipment id is
+  // stored with the value so a stale result from a previous item cannot make
+  // the new item look favorited.
+  const [favorite, setFavorite] = useState<{
+    equipmentId: string;
+    favorited: boolean;
+  } | null>(null);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+
   // We only need a token when somebody is logged in.
   const isSignedIn = Boolean(session?.user);
+  const isCustomer = session?.user?.role === "customer";
+
+  // Derived values let the favorite-check effect depend on stable primitives.
+  const equipmentId = equipment?._id;
+  const equipmentStatus = equipment?.status;
+  const isFavorite =
+    favorite !== null &&
+    favorite.equipmentId === equipmentId &&
+    favorite.favorited;
 
   useEffect(() => {
     if (isSessionPending) return;
@@ -77,6 +97,41 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
     };
   }, [id, isSessionPending, isSignedIn, reloadKey]);
 
+  // Keep the heart button accurate after a reload. Only customers can
+  // favorite approved equipment.
+  useEffect(() => {
+    if (
+      isSessionPending ||
+      isTogglingFavorite ||
+      !isCustomer ||
+      !equipmentId ||
+      equipmentStatus !== "approved"
+    ) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    checkFavorite(equipmentId)
+      .then((favorited) => {
+        if (!isCancelled) setFavorite({ equipmentId, favorited });
+      })
+      .catch(() => {
+        // A failed check must not break the page or overwrite a value the
+        // customer just set. The toggle call surfaces any real error.
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    equipmentId,
+    equipmentStatus,
+    isCustomer,
+    isSessionPending,
+    isTogglingFavorite,
+  ]);
+
   // Admin only: approve or reject the item.
   const handleStatusChange = async (status: TEquipmentStatus) => {
     if (!equipment) return;
@@ -101,6 +156,34 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
   const handleBook = () => {
     // The booking and payment flow will be added in a later step.
     toast.info("Booking is coming soon.");
+  };
+
+  // Toggle immediately for instant feedback, then sync with the server. If the
+  // request fails, put the previous value back and tell the customer.
+  const handleToggleFavorite = async () => {
+    if (!equipment || isTogglingFavorite) return;
+
+    const previous = isFavorite;
+    const next = !previous;
+
+    setFavorite({ equipmentId: equipment._id, favorited: next });
+    setIsTogglingFavorite(true);
+
+    try {
+      const favorited = await toggleFavorite(equipment._id);
+      setFavorite({ equipmentId: equipment._id, favorited });
+      toast.success(
+        favorited ? "Added to favorites" : "Removed from favorites",
+      );
+    } catch (cause) {
+      setFavorite({ equipmentId: equipment._id, favorited: previous });
+      toast.error("Could not update favorites", {
+        description:
+          cause instanceof Error ? cause.message : "Please try again.",
+      });
+    } finally {
+      setIsTogglingFavorite(false);
+    }
   };
 
   if (isLoading) {
@@ -149,7 +232,6 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
   const isOwner =
     Boolean(session?.user) && session?.user?.id === equipment.ownerId;
   const isAdmin = session?.user?.role === "admin";
-  const isCustomer = session?.user?.role === "customer";
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-4 py-10">
@@ -215,9 +297,30 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
             <>
               {session?.user ? (
                 isCustomer ? (
-                  <Button type="button" onClick={handleBook}>
-                    Book Now
-                  </Button>
+                  <>
+                    <Button
+                      type="button"
+                      variant={isFavorite ? "secondary" : "outline"}
+                      onClick={handleToggleFavorite}
+                      disabled={isTogglingFavorite}
+                    >
+                      {isTogglingFavorite ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Heart
+                          className={
+                            isFavorite ? "size-4 fill-current" : "size-4"
+                          }
+                        />
+                      )}
+                      {isFavorite
+                        ? "Remove from Favorites"
+                        : "Add to Favorites"}
+                    </Button>
+                    <Button type="button" onClick={handleBook}>
+                      Book Now
+                    </Button>
+                  </>
                 ) : null
               ) : (
                 <Link href="/login" className={buttonVariants()}>
