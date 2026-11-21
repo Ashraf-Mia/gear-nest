@@ -33,9 +33,10 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  // ফর্মে দেখানো মোট দাম
+  // Live total for the form. TEquipment stores the price in `rentalPrice`
+  // and the stock in `availableQuantity`; `price`/`quantity` do not exist.
   const total = calculateTotal(
-    item.price,
+    item.rentalPrice,
     item.rentalType,
     startDate,
     endDate,
@@ -58,8 +59,11 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
     if (endDate < startDate) {
       return toast.error("End date must be after start date");
     }
-    if (qty < 1 || qty > item.quantity) {
-      return toast.error(`Quantity must be between 1 and ${item.quantity}`);
+    // `availableQuantity` is the stock field on TEquipment.
+    if (qty < 1 || qty > item.availableQuantity) {
+      return toast.error(
+        `Quantity must be between 1 and ${item.availableQuantity}`,
+      );
     }
     if (!/^[0-9+\-\s]{7,15}$/.test(extra.contact)) {
       return toast.error("Enter a valid contact number");
@@ -94,8 +98,8 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
         <DialogHeader>
           <DialogTitle>Book {item.name}</DialogTitle>
           <DialogDescription>
-            ${item.price} / {item.rentalType}. Fill in the details to continue
-            to payment.
+            ${item.rentalPrice} / {item.rentalType}. Fill in the details to
+            continue to payment.
           </DialogDescription>
         </DialogHeader>
 
@@ -132,7 +136,7 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
                 id="quantity"
                 type="number"
                 min={1}
-                max={item.quantity}
+                max={item.availableQuantity}
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 required

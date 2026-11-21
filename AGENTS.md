@@ -185,8 +185,8 @@ Status key: ✅ done · 🟡 partial/needs hardening · ❌ missing · ⚠️ ne
 | Details page | All required equipment + owner + terms info | ✅ | `components/equipment/equipment-details.tsx` |
 | Details privacy | Brief lists this as a **private route** | ⚠️ | Currently public; guests can open a direct URL |
 | Favorites | Add/remove on details, persisted, shown in dashboard | ✅ | Heart button on details (optimistic toggle + revert on error), `GET /favorites` list, `GET /favorites/check`, `POST /favorites/toggle`, `DELETE /favorites/:equipmentId` |
-| Book Now modal | Dates, quantity, contact, address, notes | ❌ | Button only shows "coming soon" toast |
-| Payment | Stripe checkout + success page + payment record | ❌ | No Stripe dependency yet |
+| Book Now modal | Dates, quantity, contact, address, notes | ✅ | Opens from details page; live total; sends to Stripe Checkout |
+| Payment | Stripe checkout + success page + payment record | 🟡 | Checkout, success/cancel pages, confirm route, and `/webhook` implemented; needs a live Stripe test-key run |
 
 ### 3.3 Customer dashboard
 

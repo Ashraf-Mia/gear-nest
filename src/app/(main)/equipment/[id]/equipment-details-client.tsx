@@ -155,11 +155,6 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
     }
   };
 
-  const handleBook = () => {
-    // The booking and payment flow will be added in a later step.
-    toast.info("Booking is coming soon.");
-  };
-
   // Toggle immediately for instant feedback, then sync with the server. If the
   // request fails, put the previous value back and tell the customer.
   const handleToggleFavorite = async () => {
@@ -319,10 +314,11 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
                         ? "Remove from Favorites"
                         : "Add to Favorites"}
                     </Button>
+                    {/* TEquipment stores stock in `availableQuantity`. */}
                     <Button
                       type="button"
                       onClick={() => setBookingOpen(true)}
-                      disabled={equipment.quantity < 1}
+                      disabled={equipment.availableQuantity < 1}
                     >
                       Book Now
                     </Button>

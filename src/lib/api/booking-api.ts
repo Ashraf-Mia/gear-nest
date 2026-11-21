@@ -18,9 +18,13 @@ export function calculateTotal(
       (new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000,
     ) + 1;
 
+  // The equipment form stores rentalType as "Daily", "Weekly", or "Monthly".
+  // Lowercasing keeps this calculation correct for those capitalized values.
+  const type = rentalType.toLowerCase();
+
   let units = days;
-  if (rentalType === "weekly") units = Math.ceil(days / 7);
-  if (rentalType === "monthly") units = Math.ceil(days / 30);
+  if (type === "weekly") units = Math.ceil(days / 7);
+  if (type === "monthly") units = Math.ceil(days / 30);
 
   return price * units * quantity;
 }
