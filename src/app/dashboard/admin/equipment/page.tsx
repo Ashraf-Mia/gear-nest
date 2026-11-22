@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Check, X } from "lucide-react";
+import { Check, Eye, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +19,8 @@ import {
   getAllEquipmentForAdmin,
   updateEquipmentStatus,
 } from "@/lib/api/admin";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 // import {
 //   getAllEquipmentForAdmin,
 //   updateEquipmentStatus,
@@ -110,6 +112,15 @@ export default function AdminEquipmentPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <Link
+                          href={`/equipment/${item._id}`}
+                          className={buttonVariants({
+                            size: "sm",
+                            variant: "ghost",
+                          })}
+                        >
+                          <Eye className="size-4" /> Details
+                        </Link>
                         <Button
                           size="sm"
                           disabled={
