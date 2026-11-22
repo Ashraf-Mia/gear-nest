@@ -1,3 +1,5 @@
+// import { Role } from "@/lib/menus";
+
 export type TRole = "customer" | "owner" | "admin";
 
 export type TRegisterRole = Exclude<TRole, "admin">;
@@ -63,4 +65,21 @@ export type TBooking = {
   bookingStatus: BookingStatus;
   createdAt: string;
   customerName?: string;
+};
+
+export type TProfile = {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  phone?: string;
+  address?: string;
+  role: TRole;
+};
+
+export type TProfileInput = {
+  name: string;
+  image: string;
+  phone: string;
+  address: string;
 };

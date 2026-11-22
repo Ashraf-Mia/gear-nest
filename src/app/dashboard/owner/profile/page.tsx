@@ -1,3 +1,5 @@
+import ProfileForm from "@/components/dashboard/profile-form";
+
 export default function OwnerProfilePage() {
-  return <h1 className="text-2xl">Owner Profile</h1>;
+  return <ProfileForm />;
 }

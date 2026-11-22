@@ -1,3 +1,9 @@
+import ProfileForm from "@/components/dashboard/profile-form";
+
 export default function AdminProfilePage() {
-  return <h1 className="text-2xl">Admin Profile</h1>;
+  return (
+    <>
+      <ProfileForm />
+    </>
+  );
 }
