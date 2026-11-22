@@ -97,10 +97,19 @@ export default function Footer() {
               <MapPin className="size-4 text-primary" /> Dhaka, Bangladesh
             </li>
             <li className="flex items-center gap-2">
-              <Phone className="size-4 text-primary" /> +880 1234-567890
+              <Phone className="size-4 text-primary" />
+              <a href="tel:+8801709165682" className="hover:underline">
+                +880 1709-165682
+              </a>
             </li>
             <li className="flex items-center gap-2">
-              <Mail className="size-4 text-primary" /> support@gearnest.com
+              <Mail className="size-4 text-primary" />
+              <a
+                href="mailto:ashrafali27483@gmail.com"
+                className="hover:underline"
+              >
+                ashrafali27483@gmail.com
+              </a>
             </li>
           </ul>
         </div>

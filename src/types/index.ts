@@ -116,3 +116,11 @@ export type TAdminAnalytics = {
   completedRentals: number;
   monthlyStats: { month: string; bookings: number; revenue: number }[];
 };
+
+export type TAppUser = {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  role?: TRole;
+};

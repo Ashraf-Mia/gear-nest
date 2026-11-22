@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import ThemeToggle from "@/components/shared/theme-toggle";
 
@@ -20,6 +20,7 @@ import { authClient } from "@/lib/auth-client";
 import { clearTokenCache } from "@/lib/getTokenFromClient";
 
 import { toast } from "sonner";
+// import { TAppUser } from "@/types";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -74,10 +75,10 @@ function AccountMenu({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem render={<Link href="/#" />}>
+        {/* <DropdownMenuItem render={<Link href="/#" />}>
           <UserRound className="size-4" />
           Profile
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
         <DropdownMenuItem render={<Link href="/dashboard" />}>
           <LayoutDashboard className="size-4" />
           Dashboard
