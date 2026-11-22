@@ -7,7 +7,7 @@ import EquipmentBrowser from "./equipment-browser";
 function EquipmentBrowserFallback() {
   return (
     <>
-      <div className="mt-8 h-[9.75rem] animate-pulse rounded-xl bg-muted" />
+      <div className="mt-8 h-39 animate-pulse rounded-xl bg-muted" />
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="h-80 animate-pulse rounded-xl bg-muted" />
