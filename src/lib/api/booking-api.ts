@@ -4,7 +4,7 @@ import { TBooking } from "@/types";
 import { getTokenFromClient } from "../getTokenFromClient";
 import { API_URL } from "./config";
 
-// শুধু ফর্মে দাম দেখানোর জন্য (আসল হিসাব সার্ভারে হয়)
+// Calculates the total amount for a booking based on the rental type, dates, and quantity.
 export function calculateTotal(
   price: number,
   rentalType: string,
@@ -19,8 +19,6 @@ export function calculateTotal(
       (new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000,
     ) + 1;
 
-  // The equipment form stores rentalType as "Daily", "Weekly", or "Monthly".
-  // Lowercasing keeps this calculation correct for those capitalized values.
   const type = rentalType.toLowerCase();
 
   let units = days;
@@ -40,7 +38,6 @@ type CheckoutData = {
   notes: string;
 };
 
-// সার্ভার থেকে Stripe পেমেন্ট পেজের লিংক আনে
 export async function createCheckoutSession(
   data: CheckoutData,
 ): Promise<string> {
@@ -58,14 +55,12 @@ export async function createCheckoutSession(
   const result = await response.json();
 
   if (!response.ok) {
-    // সার্ভারের মেসেজ (যেমন "Only 2 available") সরাসরি দেখাবো
     throw new Error(result.message || "Could not start payment");
   }
 
   return result.url;
 }
 
-// পেমেন্ট সফল হওয়ার পর সার্ভারকে জানায়
 export async function confirmPayment(sessionId: string) {
   const token = await getTokenFromClient();
 
@@ -87,7 +82,6 @@ export async function confirmPayment(sessionId: string) {
   return result as { success: boolean; transactionId: string; amount: number };
 }
 
-// লগইন করা customer-এর সব booking আনে
 export async function getMyBookings(): Promise<TBooking[]> {
   const token = await getTokenFromClient();
 
@@ -97,6 +91,21 @@ export async function getMyBookings(): Promise<TBooking[]> {
 
   if (!response.ok) {
     throw new Error("Could not load your rentals. Please try again.");
+  }
+
+  return response.json();
+}
+
+// Fetches bookings for the logged-in owner. This is used in the owner dashboard.
+export async function getOwnerBookings(): Promise<TBooking[]> {
+  const token = await getTokenFromClient();
+
+  const response = await fetch(`${API_URL}/bookings/owner`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    throw new Error("Could not load rentals. Please try again.");
   }
 
   return response.json();

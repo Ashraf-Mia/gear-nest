@@ -97,3 +97,12 @@ export type TProfileInput = {
   phone: string;
   address: string;
 };
+
+export type TOwnerAnalytics = {
+  totalEquipment: number;
+  approvedEquipment: number;
+  totalBookings: number;
+  completedRentals: number;
+  totalEarnings: number;
+  monthlyEarnings: { month: string; earnings: number }[];
+};
