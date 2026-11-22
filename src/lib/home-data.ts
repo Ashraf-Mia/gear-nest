@@ -14,7 +14,6 @@ import {
   Wallet,
 } from "lucide-react";
 
-// ক্যাটাগরির নাম অবশ্যই ডাটাবেসের category-র সাথে হুবহু মিলতে হবে
 export const homeCategories = [
   { name: "Construction Equipment", icon: HardHat },
   { name: "Photography Equipment", icon: Camera },

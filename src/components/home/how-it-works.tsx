@@ -27,7 +27,6 @@ export default function HowItWorks() {
               variants={fadeUp}
               className="relative flex h-full flex-col items-center rounded-xl border bg-card p-6 text-center shadow-sm"
             >
-              {/* ধাপের নম্বর */}
               <span className="absolute -top-3 left-1/2 flex size-7 -translate-x-1/2 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
                 {index + 1}
               </span>
