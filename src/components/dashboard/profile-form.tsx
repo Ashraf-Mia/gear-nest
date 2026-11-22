@@ -22,7 +22,6 @@ export default function ProfileForm() {
   const [editing, setEditing] = useState(false); // true হলে ফর্ম দেখায়
   const [saving, setSaving] = useState(false);
 
-  // পেজ খুললে একবার প্রোফাইল আনবে
   useEffect(() => {
     getProfile()
       .then(setProfile)
@@ -33,7 +32,6 @@ export default function ProfileForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // ফর্মের সব ঘরের ডেটা একবারে (input-এর name অনুযায়ী)
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries()) as TProfileInput;
 
@@ -47,11 +45,9 @@ export default function ProfileForm() {
     try {
       setSaving(true);
 
-      // ১. আমাদের ডাটাবেসে সব ফিল্ড সেভ
       const updated = await updateProfile(data);
       setProfile(updated);
 
-      // ২. সাইডবারের নাম-ছবিও সাথে সাথে বদলানোর জন্য BetterAuth সেশন আপডেট
       await authClient.updateUser({
         name: data.name,
         image: data.image || undefined,
@@ -89,7 +85,6 @@ export default function ProfileForm() {
       </p>
 
       <div className="mt-6 rounded-xl border bg-card">
-        {/* ওপরের অংশ: ছবি, নাম, রোল */}
         <div className="flex flex-col items-center gap-4 border-b p-6 text-center sm:flex-row sm:text-left">
           <Avatar className="size-24 border-2 border-primary">
             <AvatarImage src={profile.image || undefined} alt={profile.name} />
@@ -113,7 +108,6 @@ export default function ProfileForm() {
           )}
         </div>
 
-        {/* নিচের অংশ: দেখার মোড অথবা এডিট ফর্ম */}
         <div className="p-6">
           {editing ? (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -128,7 +122,6 @@ export default function ProfileForm() {
                   />
                 </div>
 
-                {/* ইমেইল বদলানো যায় না */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" value={profile.email} disabled />

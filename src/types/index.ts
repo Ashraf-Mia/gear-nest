@@ -65,6 +65,20 @@ export type TBooking = {
   bookingStatus: BookingStatus;
   createdAt: string;
   customerName?: string;
+  // Added by GET /bookings, which joins the equipment document.
+  ownerName?: string;
+  equipmentImage?: string;
+};
+
+// Shape of one row in the admin "All Users" table. The API only returns these
+// fields, so the browser never receives account or session documents.
+export type TAdminUser = {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  role: TRole;
+  createdAt: string;
 };
 
 export type TProfile = {

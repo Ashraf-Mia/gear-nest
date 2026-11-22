@@ -26,7 +26,7 @@ const navLinks = [
   { label: "All Equipment", href: "/equipment" },
   { label: "How It Works", href: "/#how-it-works" },
   { label: "About Us", href: "/about" },
-  { label: "Contact Us", href: "/contact" },
+  // { label: "Contact Us", href: "/contact" },
 ];
 
 const loginStyle = buttonVariants({
