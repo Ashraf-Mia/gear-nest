@@ -39,7 +39,6 @@ export default function MyRentalsPage() {
   const [bookings, setBookings] = useState<TBooking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // পেজ খুললে একবার booking আনবে
   useEffect(() => {
     getMyBookings()
       .then(setBookings)
@@ -56,14 +55,12 @@ export default function MyRentalsPage() {
 
       <div className="mt-6 rounded-xl border bg-card">
         {loading ? (
-          // লোডিংয়ের সময় ফাঁকা সারি
           <div className="space-y-3 p-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <Skeleton key={i} className="h-10 w-full" />
             ))}
           </div>
         ) : bookings.length === 0 ? (
-          // কোনো booking না থাকলে
           <div className="py-16 text-center">
             <p className="text-muted-foreground">You have no rentals yet.</p>
             <Link
@@ -74,7 +71,6 @@ export default function MyRentalsPage() {
             </Link>
           </div>
         ) : (
-          // মোবাইলে টেবিল ডানে-বামে স্ক্রল হবে
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>

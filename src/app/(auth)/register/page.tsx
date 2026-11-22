@@ -53,7 +53,6 @@ export default function RegisterPage() {
     };
   }, [imagePreview]);
 
-  // Upload the selected image to our API route, which then sends it to ImgBB.
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -62,7 +61,6 @@ export default function RegisterPage() {
 
     if (!file) return;
 
-    // Basic checks before sending the file to the server.
     if (!file.type.startsWith("image/")) {
       toast.warning("Invalid file", {
         description: "Please choose an image file such as JPG, PNG, or WEBP.",
@@ -79,7 +77,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // Show the image immediately while it uploads.
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
     setUploadedImageUrl("");
@@ -116,7 +113,7 @@ export default function RegisterPage() {
       });
     } finally {
       setIsUploading(false);
-      // Clear the file input so the same file can be selected again later.
+
       input.value = "";
     }
   };
@@ -212,7 +209,6 @@ export default function RegisterPage() {
     }
 
     if (data) {
-      // Start fresh with the new account's token.
       clearTokenCache();
 
       toast.success("Welcome!", {

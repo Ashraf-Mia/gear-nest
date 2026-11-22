@@ -36,7 +36,7 @@ const statusColor: Record<string, string> = {
 export default function AdminEquipmentPage() {
   const [items, setItems] = useState<TEquipment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(""); // কোনটার বাটন চলছে
+  const [updatingId, setUpdatingId] = useState("");
 
   useEffect(() => {
     getAllEquipmentForAdmin()
@@ -45,7 +45,6 @@ export default function AdminEquipmentPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // স্ট্যাটাস বদলে টেবিলও সাথে সাথে আপডেট
   const handleStatus = async (id: string, status: TEquipmentStatus) => {
     try {
       setUpdatingId(id);

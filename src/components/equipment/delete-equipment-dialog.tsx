@@ -22,8 +22,6 @@ type DeleteEquipmentDialogProps = {
   label?: string;
 };
 
-// A reusable "Delete" button with a confirmation dialog.
-// Because each row has its own component, only the clicked row shows loading.
 export default function DeleteEquipmentDialog({
   equipment,
   onDeleted,
@@ -33,13 +31,11 @@ export default function DeleteEquipmentDialog({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    // Show the loading state on this button straight away.
     setIsDeleting(true);
 
     try {
       await deleteEquipment(equipment._id);
 
-      // Remove the row from the table immediately (no full page reload).
       onDeleted?.(equipment._id);
 
       setOpen(false);

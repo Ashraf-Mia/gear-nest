@@ -6,13 +6,11 @@ import { motion } from "framer-motion";
 import { ShieldCheck, CreditCard, CalendarClock } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
-// হেডিংয়ের দুটো লাইন। highlight: true মানে অরেঞ্জ রঙ হবে
 const lines = [
   { text: "Rent Smart.", highlight: false },
   { text: "Work Better.", highlight: true },
 ];
 
-// নিচের ৩টা ট্রাস্ট পয়েন্ট
 const trustPoints = [
   { icon: ShieldCheck, text: "Verified Owners" },
   { icon: CreditCard, text: "Secure Payment" },

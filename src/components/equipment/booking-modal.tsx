@@ -25,7 +25,6 @@ type Props = {
 };
 
 export default function BookingModal({ item, open, onOpenChange }: Props) {
-  // এই তিনটা ঘরের মান লাগবে লাইভ দাম দেখানোর জন্য
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -33,8 +32,6 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  // Live total for the form. TEquipment stores the price in `rentalPrice`
-  // and the stock in `availableQuantity`; `price`/`quantity` do not exist.
   const total = calculateTotal(
     item.rentalPrice,
     item.rentalType,
@@ -46,7 +43,6 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // বাকি তিন ঘরের ডেটা FormData থেকে
     const formData = new FormData(e.currentTarget);
     const extra = Object.fromEntries(formData.entries()) as {
       contact: string;
@@ -59,7 +55,7 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
     if (endDate < startDate) {
       return toast.error("End date must be after start date");
     }
-    // `availableQuantity` is the stock field on TEquipment.
+
     if (qty < 1 || qty > item.availableQuantity) {
       return toast.error(
         `Quantity must be between 1 and ${item.availableQuantity}`,
@@ -82,7 +78,6 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
         notes: extra.notes,
       });
 
-      // Stripe-এর পেমেন্ট পেজে পাঠানো
       window.location.href = url;
     } catch (error) {
       toast.error(
@@ -173,7 +168,6 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
             />
           </div>
 
-          {/* মোট দাম */}
           <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3">
             <span className="text-sm text-muted-foreground">Total Amount</span>
             <span className="text-xl font-bold text-navy dark:text-white">

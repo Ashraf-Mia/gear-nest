@@ -19,15 +19,11 @@ function DetailItem({
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-0.5 text-sm font-medium">
-        {value === "" ? "—" : value}
-      </p>
+      <p className="mt-0.5 text-sm font-medium">{value === "" ? "—" : value}</p>
     </div>
   );
 }
 
-// This component only shows the equipment data. It is reused by the shared
-// /equipment/[id] page.
 export default function EquipmentDetails({
   equipment,
 }: {

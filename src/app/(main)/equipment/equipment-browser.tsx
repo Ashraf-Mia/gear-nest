@@ -14,8 +14,6 @@ import type { EquipmentResponse } from "@/types";
 
 export const EQUIPMENT_PAGE_SIZE = 9;
 
-// Text inputs write to the URL after a short pause so typing does not fire a
-// request per keystroke. Dropdowns apply immediately.
 const TYPING_DELAY_MS = 400;
 
 const FILTER_KEYS = [
@@ -45,8 +43,6 @@ const emptyFilters: TFilters = {
 const selectClass =
   "h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring";
 
-// The URL is the single source of truth for the filters, so a shared link, a
-// hard reload and the browser back button all restore the same list.
 function readFilters(params: URLSearchParams): TFilters {
   const filters = { ...emptyFilters };
 
@@ -69,32 +65,22 @@ export default function EquipmentBrowser() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // A string that only changes when the query string changes. The request and
-  // the input sync below both key off it, which keeps one source of truth.
   const queryKey = searchParams.toString();
 
   const filters = readFilters(new URLSearchParams(queryKey));
   const page = readPage(new URLSearchParams(queryKey));
 
-  // Text inputs keep a local copy so typing stays instant. The value is written
-  // to the URL after the debounce and read back when the URL changes elsewhere
-  // (back button, footer category link, reset).
   const [searchText, setSearchText] = useState(filters.search);
   const [minPriceText, setMinPriceText] = useState(filters.minPrice);
   const [maxPriceText, setMaxPriceText] = useState(filters.maxPrice);
 
   const [data, setData] = useState<EquipmentResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  // The request lives in lib/api, but failures still need to be shown here.
+
   const [error, setError] = useState("");
-  // Changing this key re-runs the effect for the "Try again" button.
+
   const [reloadKey, setReloadKey] = useState(0);
 
-  // Keep the inputs in step when the filters change from outside this form
-  // (back button, footer category link, reset). React supports setting state
-  // during render for exactly this case, which avoids the extra render an
-  // effect would add. Our own writes already match the drafts, so adopting the
-  // URL here is a no-op unless the change came from somewhere else.
   const [syncedQuery, setSyncedQuery] = useState(queryKey);
 
   if (syncedQuery !== queryKey) {
@@ -104,9 +90,6 @@ export default function EquipmentBrowser() {
     setMaxPriceText(filters.maxPrice);
   }
 
-  // Filters live in the query string. `replace` is used for typed input so the
-  // history does not fill with one entry per pause; discrete actions use
-  // `push` so the back button steps through the filters the user chose.
   const writeQuery = useCallback(
     (
       updates: Record<string, string | number | undefined>,
@@ -114,8 +97,6 @@ export default function EquipmentBrowser() {
     ) => {
       const params = new URLSearchParams(queryKey);
 
-      // Fold in text that is still waiting for the debounce. Without this,
-      // clicking a dropdown right after typing would drop what was typed.
       const typed: Record<string, string> = {
         search: searchText,
         minPrice: minPriceText,
@@ -132,13 +113,11 @@ export default function EquipmentBrowser() {
       Object.entries(updates).forEach(([key, value]) => {
         if (value === undefined) return;
 
-        // Page 1 is the default, so it stays out of the URL.
         if (key === "page" && Number(value) <= 1) params.delete(key);
         else if (value === "") params.delete(key);
         else params.set(key, String(value));
       });
 
-      // Any filter change starts over from the first page.
       if (!("page" in updates)) params.delete("page");
 
       const href = params.toString() ? `${pathname}?${params}` : pathname;
@@ -158,8 +137,6 @@ export default function EquipmentBrowser() {
       ["maxPrice", maxPriceText],
     ];
 
-    // Only values that differ from the URL are written, so this effect settles
-    // instead of looping once the URL catches up with the input.
     const pending = typed.filter(([key, value]) => value !== committed[key]);
 
     if (pending.length === 0) return;
@@ -170,14 +147,6 @@ export default function EquipmentBrowser() {
 
     return () => clearTimeout(timer);
   }, [searchText, minPriceText, maxPriceText, queryKey, writeQuery]);
-
-  // পেজ খুললে URL-এ ?category=... থাকলে সেটা ফিল্টারে বসাবে
-  // useEffect(() => {
-  //   const category = new URLSearchParams(window.location.search).get("category");
-  //   if (category) {
-  //     setFilters((prev) => ({ ...prev, category }));
-  //   }
-  // }, []);
 
   useEffect(() => {
     // Prevents a slow, older request from overwriting a newer result.
@@ -270,8 +239,7 @@ export default function EquipmentBrowser() {
             onChange={(e) => setFilter("rentalType", e.target.value)}
           >
             <option value="">All Rental Types</option>
-            {/* The form stores "Daily"/"Weekly"/"Monthly", so reuse the same
-                values here instead of lowercase ones the server cannot match. */}
+
             {RENTAL_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -335,8 +303,6 @@ export default function EquipmentBrowser() {
           ))}
         </div>
       ) : error ? (
-        // A failed request is different from "no results", so show it instead
-        // of the empty state and let the user retry.
         <div className="py-20 text-center">
           <p className="font-medium">Could not load equipment</p>
           <p className="mt-1 text-sm text-muted-foreground">{error}</p>

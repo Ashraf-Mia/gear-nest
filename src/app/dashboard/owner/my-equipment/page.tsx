@@ -64,8 +64,6 @@ export default function OwnerMyEquipmentPage() {
       setError("");
 
       try {
-        // One request for the owner's list. The token is cached, so this is
-        // not fetched again on every action.
         const data = await getOwnerEquipment();
 
         if (!isCancelled) {
@@ -94,14 +92,12 @@ export default function OwnerMyEquipmentPage() {
     };
   }, [owner?.id, reloadKey]);
 
-  // Put the updated item into the list directly. No full re-fetch.
   const handleUpdated = (updated: TEquipment) => {
     setEquipment((items) =>
       items.map((item) => (item._id === updated._id ? updated : item)),
     );
   };
 
-  // Remove the deleted item from the list directly. No full re-fetch.
   const handleDeleted = (id: string) => {
     setEquipment((items) => items.filter((item) => item._id !== id));
   };
@@ -282,7 +278,6 @@ export default function OwnerMyEquipmentPage() {
 
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1.5">
-                        {/* View uses the one shared details page. */}
                         <Link
                           href={`/equipment/${item._id}`}
                           className={buttonVariants({

@@ -10,8 +10,6 @@ export default function MainLayout({
 }) {
   return (
     <>
-      {/* The navbar reads the current URL, so it needs a Suspense boundary
-          when a dynamic route such as /equipment/[id] is prerendered. */}
       <Suspense
         fallback={
           <header className="h-16 border-b border-white/10 bg-navy-dark" />

@@ -2,7 +2,6 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export async function POST(request: Request) {
   try {
-    // The API key stays on the server. It is never sent to the browser.
     const apiKey = process.env.IMGBB_API_KEY;
     if (!apiKey) {
       return Response.json(
@@ -14,7 +13,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Read the file from the form data sent by the client.
     const formData = await request.formData();
     const file = formData.get("image");
 
@@ -39,7 +37,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // ImgBB expects the image as a base64 string.
     const base64Image = Buffer.from(await file.arrayBuffer()).toString(
       "base64",
     );
@@ -47,7 +44,6 @@ export async function POST(request: Request) {
     const imgbbForm = new FormData();
     imgbbForm.append("image", base64Image);
 
-    // Upload the image to ImgBB.
     const imgbbResponse = await fetch(
       `https://api.imgbb.com/1/upload?key=${apiKey}`,
       {
@@ -72,7 +68,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Return the hosted image URL to the form.
     return Response.json({
       url: imgbbData.data.url,
       deleteUrl: imgbbData.data.delete_url,

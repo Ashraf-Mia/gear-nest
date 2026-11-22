@@ -12,8 +12,6 @@ export default function EquipmentCard({
   item: TEquipment;
   isLoggedIn: boolean;
 }) {
-  // The add/edit forms save `availableQuantity`, not `quantity`. Reading the
-  // old field made every card look "Unavailable".
   const available = item.availableQuantity > 0;
 
   return (

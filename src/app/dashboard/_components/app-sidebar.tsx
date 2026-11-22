@@ -36,7 +36,7 @@ export default function AppSidebar() {
 
   const handleLogout = async () => {
     await authClient.signOut();
-    // Forget the saved JWT of the user who just logged out.
+
     clearTokenCache();
     router.push("/login");
     router.refresh();

@@ -22,7 +22,6 @@ function SuccessContent() {
       return;
     }
 
-    // সার্ভারকে বলা: পেমেন্ট যাচাই করে booking save করো
     confirmPayment(sessionId)
       .then(setResult)
       .catch((err) => setError(err.message));
@@ -81,7 +80,6 @@ function SuccessContent() {
 export default function PaymentSuccessPage() {
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-xl items-center justify-center px-4 py-16">
-      {/* useSearchParams ব্যবহার করলে Suspense লাগে, নাহলে build-এ এরর আসে */}
       <Suspense
         fallback={<Loader2 className="size-10 animate-spin text-primary" />}
       >

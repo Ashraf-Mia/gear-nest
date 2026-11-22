@@ -55,7 +55,6 @@ export default function CustomerFavoritesPage() {
   const [removingId, setRemovingId] = useState("");
 
   useEffect(() => {
-    // Wait for the session so we do not call the API as a guest.
     if (isSessionPending) return;
 
     if (!isCustomer) {
@@ -103,7 +102,6 @@ export default function CustomerFavoritesPage() {
     try {
       await removeFavorite(equipment._id);
 
-      // Remove locally so the table updates without a full page reload.
       setFavorites((items) =>
         items.filter((item) => item._id !== equipment._id),
       );

@@ -65,7 +65,7 @@ export type TBooking = {
   bookingStatus: BookingStatus;
   createdAt: string;
   customerName?: string;
-  // Added by GET /bookings, which joins the equipment document.
+
   ownerName?: string;
   equipmentImage?: string;
 };

@@ -28,8 +28,6 @@ type UpdateEquipmentDialogProps = {
   label?: string;
 };
 
-// A reusable "Update" button that opens its own dialog.
-// The parent page decides what to do with the saved item through onUpdated.
 export default function UpdateEquipmentDialog({
   equipment,
   onUpdated,
@@ -50,19 +48,16 @@ export default function UpdateEquipmentDialog({
       availableQuantity: Number(formData.get("availableQuantity")),
     };
 
-    // Show the new values in the table straight away (optimistic update).
     onUpdated?.({ ...equipment, ...values });
     setIsSaving(true);
 
     try {
       const updated = await updateEquipment(equipment._id, values);
 
-      // Replace the optimistic row with the saved row from the backend.
       onUpdated?.(updated);
       setOpen(false);
       toast.success("Equipment updated");
     } catch (cause) {
-      // The request failed, so put the old values back.
       onUpdated?.(equipment);
 
       toast.error("Update failed", {

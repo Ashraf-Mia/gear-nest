@@ -36,21 +36,15 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
 
-  // Favorite state is kept separate from the equipment so the heart button can
-  // update instantly without reloading the whole page. The equipment id is
-  // stored with the value so a stale result from a previous item cannot make
-  // the new item look favorited.
   const [favorite, setFavorite] = useState<{
     equipmentId: string;
     favorited: boolean;
   } | null>(null);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
-  // We only need a token when somebody is logged in.
   const isSignedIn = Boolean(session?.user);
   const isCustomer = session?.user?.role === "customer";
 
-  // Derived values let the favorite-check effect depend on stable primitives.
   const equipmentId = equipment?._id;
   const equipmentStatus = equipment?.status;
   const isFavorite =
@@ -68,8 +62,6 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
       setError("");
 
       try {
-        // Logged-in users also send their token. The backend needs it to show
-        // pending/rejected equipment to its owner or to an admin.
         const token = isSignedIn ? await getTokenFromClient() : undefined;
         const data = await getEquipmentById(id, token);
 
@@ -99,8 +91,6 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
     };
   }, [id, isSessionPending, isSignedIn, reloadKey]);
 
-  // Keep the heart button accurate after a reload. Only customers can
-  // favorite approved equipment.
   useEffect(() => {
     if (
       isSessionPending ||
@@ -118,10 +108,7 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
       .then((favorited) => {
         if (!isCancelled) setFavorite({ equipmentId, favorited });
       })
-      .catch(() => {
-        // A failed check must not break the page or overwrite a value the
-        // customer just set. The toggle call surfaces any real error.
-      });
+      .catch(() => {});
 
     return () => {
       isCancelled = true;
@@ -155,8 +142,6 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
     }
   };
 
-  // Toggle immediately for instant feedback, then sync with the server. If the
-  // request fails, put the previous value back and tell the customer.
   const handleToggleFavorite = async () => {
     if (!equipment || isTogglingFavorite) return;
 
@@ -314,7 +299,7 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
                         ? "Remove from Favorites"
                         : "Add to Favorites"}
                     </Button>
-                    {/* TEquipment stores stock in `availableQuantity`. */}
+
                     <Button
                       type="button"
                       onClick={() => setBookingOpen(true)}

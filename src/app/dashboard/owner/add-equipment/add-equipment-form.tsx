@@ -75,7 +75,6 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
     };
   }, [imagePreview]);
 
-  // Upload the selected image to our API route, which then sends it to ImgBB.
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -84,7 +83,6 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
 
     if (!file) return;
 
-    // Basic checks before sending the file to the server.
     if (!file.type.startsWith("image/")) {
       toast.warning("Invalid file", {
         description: "Please choose an image file such as JPG, PNG, or WEBP.",
@@ -101,7 +99,6 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
       return;
     }
 
-    // Show the image immediately while it uploads.
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
     setImageUrl("");
@@ -110,7 +107,6 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
     try {
       const url = await uploadImage(file);
 
-      // Store the hosted URL. This is what gets saved with the equipment.
       setImageUrl(url);
       setImagePreview(url);
 
@@ -127,7 +123,7 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
       });
     } finally {
       setIsUploading(false);
-      // Clear the file input so the same file can be selected again later.
+
       input.value = "";
     }
   };
@@ -141,8 +137,6 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
   };
 
   const handleReset = () => {
-    // The browser resets the normal inputs automatically. We only need to
-    // clear the image state because it is stored in React state.
     removeImage();
   };
 
@@ -193,7 +187,6 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
         description: "Your listing is now pending admin approval.",
       });
 
-      // Clear the form so the owner can add another item.
       form.reset();
       removeImage();
       router.refresh();
@@ -459,7 +452,6 @@ export default function AddEquipmentForm({ owner }: AddEquipmentFormProps) {
         </CardHeader>
 
         <CardContent className="space-y-3">
-          {/* This hidden input sends the uploaded ImgBB URL with the form. */}
           <input type="hidden" name="image" value={imageUrl} />
 
           <input

@@ -13,9 +13,6 @@ import {
 } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
 
-// The API already answers non-admins with 403. This keeps the page itself from
-// looking broken while that request fails, and stops the request firing at all
-// for the wrong role.
 export default function AdminPageGuard({
   children,
 }: {

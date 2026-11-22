@@ -60,7 +60,7 @@ function AdminUsersTable() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
-  // The row whose role is being saved, so only that select is disabled.
+
   const [savingId, setSavingId] = useState("");
   const [search, setSearch] = useState("");
 
@@ -98,8 +98,6 @@ function AdminUsersTable() {
     };
   }, [reloadKey]);
 
-  // The list holds every account, so this count is authoritative enough to
-  // disable the demotion before the request is sent.
   const adminCount = users.filter((user) => user.role === "admin").length;
 
   const term = search.trim().toLowerCase();
@@ -119,7 +117,6 @@ function AdminUsersTable() {
     try {
       const updated = await updateUserRole(user._id, role);
 
-      // Merge the server's copy so the row shows exactly what was stored.
       setUsers((items) =>
         items.map((item) =>
           item._id === user._id ? { ...item, ...updated } : item,
@@ -237,8 +234,7 @@ function AdminUsersTable() {
 
               <TableBody>
                 {visibleUsers.map((user) => {
-                  const isLastAdmin =
-                    user.role === "admin" && adminCount === 1;
+                  const isLastAdmin = user.role === "admin" && adminCount === 1;
 
                   return (
                     <TableRow key={user._id}>

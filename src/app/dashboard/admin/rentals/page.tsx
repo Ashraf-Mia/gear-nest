@@ -41,8 +41,6 @@ import type { TBooking } from "@/types";
 
 import AdminPageGuard from "../_components/admin-page-guard";
 
-// The API can report more states than the type lists, so unknown values still
-// get a readable badge instead of an empty one.
 const paymentBadge: Record<string, string> = {
   paid: "bg-green-600 text-white",
   unpaid: "bg-amber-500 text-white",

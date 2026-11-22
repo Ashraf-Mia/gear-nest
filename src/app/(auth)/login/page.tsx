@@ -40,7 +40,6 @@ export default function LoginPage() {
     }
 
     if (data) {
-      // Make sure we do not reuse an old user's cached token.
       clearTokenCache();
 
       toast.success("Welcome back!", {

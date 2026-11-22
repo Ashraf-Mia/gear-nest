@@ -75,10 +75,6 @@ function AccountMenu({
 
         <DropdownMenuSeparator />
 
-        {/* <DropdownMenuItem render={<Link href="/#" />}>
-          <UserRound className="size-4" />
-          Profile
-        </DropdownMenuItem> */}
         <DropdownMenuItem render={<Link href="/dashboard" />}>
           <LayoutDashboard className="size-4" />
           Dashboard
@@ -114,7 +110,6 @@ export default function Navbar() {
       return;
     }
 
-    // Forget the saved JWT of the user who just logged out.
     clearTokenCache();
 
     setMenuOpen(false);
