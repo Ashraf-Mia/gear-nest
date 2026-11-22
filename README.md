@@ -12,6 +12,11 @@ GearNest is an equipment rental marketplace. Equipment owners can list their equ
 - **Email:** ashrafali27483@gmail.com
 - **Password:** Aa123456
 
+## Github Repository
+
+- **Github Repository ( server ) :** https://github.com/Ashraf-Mia/gear-nest-server
+- **Github Repository ( client ) :** https://github.com/Ashraf-Mia/gear-nest
+
 ## Purpose
 
 The goal of this project is to connect equipment owners and customers in a safe and simple rental platform. Customers can find the equipment they need without buying it, and owners can earn money from equipment they are not using.
