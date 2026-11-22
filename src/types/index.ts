@@ -35,6 +35,7 @@ export type TEquipment = {
   ownerEmail: string;
   status: TEquipmentStatus;
   createdAt: string;
+  price: number;
 };
 
 // Shape of the paginated response from GET /equipment.
