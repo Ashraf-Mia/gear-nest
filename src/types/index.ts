@@ -106,3 +106,13 @@ export type TOwnerAnalytics = {
   totalEarnings: number;
   monthlyEarnings: { month: string; earnings: number }[];
 };
+
+export type TAdminAnalytics = {
+  totalUsers: number;
+  totalEquipment: number;
+  totalBookings: number;
+  totalRevenue: number;
+  pendingApprovals: number;
+  completedRentals: number;
+  monthlyStats: { month: string; bookings: number; revenue: number }[];
+};
