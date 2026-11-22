@@ -1,8 +1,4 @@
-import type {
-  EquipmentResponse,
-  TEquipment,
-  TEquipmentStatus,
-} from "@/types";
+import type { EquipmentResponse, TEquipment, TEquipmentStatus } from "@/types";
 
 import { API_URL } from "./config";
 
@@ -125,10 +121,7 @@ export async function createEquipment(equipment: TNewEquipment) {
   return response.json();
 }
 
-export async function updateEquipment(
-  id: string,
-  equipment: TEquipmentUpdate,
-) {
+export async function updateEquipment(id: string, equipment: TEquipmentUpdate) {
   const token = await getTokenFromClient();
 
   const response = await fetch(`${API_URL}/equipment/${id}`, {
@@ -183,4 +176,15 @@ export async function updateEquipmentStatus(
   }
 
   return response.json() as Promise<TEquipment>;
+}
+
+// The homepage shows a few featured items. The backend only returns approved
+export async function getFeaturedEquipment(): Promise<TEquipment[]> {
+  const response = await fetch(`${API_URL}/equipment/featured`);
+
+  if (!response.ok) {
+    throw new Error("Could not load featured equipment.");
+  }
+
+  return response.json();
 }
