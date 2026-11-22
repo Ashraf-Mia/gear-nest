@@ -171,6 +171,14 @@ export default function EquipmentBrowser() {
     return () => clearTimeout(timer);
   }, [searchText, minPriceText, maxPriceText, queryKey, writeQuery]);
 
+  // পেজ খুললে URL-এ ?category=... থাকলে সেটা ফিল্টারে বসাবে
+  // useEffect(() => {
+  //   const category = new URLSearchParams(window.location.search).get("category");
+  //   if (category) {
+  //     setFilters((prev) => ({ ...prev, category }));
+  //   }
+  // }, []);
+
   useEffect(() => {
     // Prevents a slow, older request from overwriting a newer result.
     let isCancelled = false;
