@@ -181,7 +181,7 @@ Status key: ✅ done · 🟡 partial/needs hardening · ❌ missing · ⚠️ ne
 | Filters | Category, rental type, price range, availability | ✅ | Server-side |
 | Sorting | Price low/high, recently added | ✅ | Server-side |
 | Pagination | Optional requirement; already present | ✅ | `limit=9` |
-| URL state | Filters shareable/deep-linkable | ❌ | Footer category links (`/equipment?category=...`) do nothing because the page ignores search params |
+| URL state | Filters shareable/deep-linkable | ✅ | Filters and page live in the query string (`?search=&category=&rentalType=&minPrice=&maxPrice=&availability=&sort=&page=`); the page reads them on load, so footer links, reloads and Back all work |
 | Details page | All required equipment + owner + terms info | ✅ | `components/equipment/equipment-details.tsx` |
 | Details privacy | Brief lists this as a **private route** | ⚠️ | Currently public; guests can open a direct URL |
 | Favorites | Add/remove on details, persisted, shown in dashboard | ✅ | Heart button on details (optimistic toggle + revert on error), `GET /favorites` list, `GET /favorites/check`, `POST /favorites/toggle`, `DELETE /favorites/:equipmentId` |
@@ -556,7 +556,7 @@ Scope every query to the owner's equipment/bookings/payments:
 - [x] Search by name/location and filter by category, rental type, price, availability happen in MongoDB, not in the browser.
 - [x] Sorting and pagination are server-side.
 - [x] Network request contains the filter params and results update after debounce.
-- [ ] Filters survive reload/share via URL (recommended; footer category links currently don't work).
+- [x] Filters survive reload/share via URL; footer category links apply the filter.
 
 ### Challenge 2 — JWT verification + role middleware
 - [x] `verifyToken`, `verifyRenter`, `verifyOwner`, `verifyAdmin` exist and use `jose`/JWKS with issuer+audience.
@@ -691,8 +691,8 @@ These are confirmed from the audit and should be treated as work items:
 7. `GET /profile` returns the raw user document; project only safe fields.
 8. Dashboard sub-routes are unguarded; `/dashboard` only redirects client-side.
 9. Register password rule is stricter than the brief (8 + digit vs 6 + upper/lower) and the placeholder copy is misleading; an allowed 6-character password is rejected. Align the client rule, Better Auth `minPasswordLength`, and the copy.
-10. Category lists disagree: `EQUIPMENT_CATEGORIES` (9 values) vs footer/brief (6 values). Pick one shared source.
-11. Footer category links don't apply because `/equipment` ignores URL query params.
+10. ✅ Fixed — footer now imports the shared `EQUIPMENT_CATEGORIES`, so its links cannot drift from the form and filter dropdowns.
+11. ✅ Fixed — `/equipment` reads and writes its filters in the URL query string.
 12. `cors()` is fully open; restrict to `CLIENT_URI` for production.
 13. Facebook login is rendered but its env keys are absent.
 14. `BETTER_AUTH_URL` is not browser-exposed; same-origin fallback works, but document/verify before changing.

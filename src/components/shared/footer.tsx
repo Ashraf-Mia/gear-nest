@@ -8,20 +8,13 @@ import {
 } from "react-icons/fa6";
 import { Mail, MapPin, Phone } from "lucide-react";
 
+import { EQUIPMENT_CATEGORIES } from "@/lib/equipment-options";
+
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "All Equipment", href: "/equipment" },
   { label: "About Us", href: "/about" },
   { label: "Contact Us", href: "/contact" },
-];
-
-const categories = [
-  "Construction Equipment",
-  "Photography Equipment",
-  "Vehicles & Transportation",
-  "Agriculture Equipment",
-  "Electronics",
-  "Event Equipment",
 ];
 
 const socials = [
@@ -82,10 +75,10 @@ export default function Footer() {
             Categories
           </h4>
           <ul className="space-y-2 text-sm">
-            {categories.map((name) => (
+            {EQUIPMENT_CATEGORIES.map((name) => (
               <li key={name}>
                 <Link
-                  href={`/equipment?category=${name}`}
+                  href={`/equipment?category=${encodeURIComponent(name)}`}
                   className="hover:text-primary"
                 >
                   {name}

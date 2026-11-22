@@ -8,7 +8,12 @@ import { API_URL } from "./config";
 
 import { getTokenFromClient } from "../getTokenFromClient";
 
-export type TNewEquipment = Omit<TEquipment, "_id" | "status" | "createdAt">;
+// The create form sends the current fields only. `price` is a legacy field the
+// server normalises into `rentalPrice`, so a new equipment payload omits it.
+export type TNewEquipment = Omit<
+  TEquipment,
+  "_id" | "status" | "createdAt" | "price"
+>;
 
 // The update form only changes these four fields.
 export type TEquipmentUpdate = Pick<
