@@ -1,36 +1,146 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GearNest
 
-## Getting Started
+GearNest is an equipment rental marketplace. Equipment owners can list their equipment for rent, and customers can browse, book and pay online for a chosen period. Admins manage users, equipment and all rental activity.
 
-First, run the development server:
+## Live URL
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Live Site:** https://gear-nest-ivory.vercel.app
+- **Server:** https://gear-nest-server-black.vercel.app
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Admin Login (for testing)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Email:** ashrafali27483@gmail.com
+- **Password:** Aa123456
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Purpose
 
-## Learn More
+The goal of this project is to connect equipment owners and customers in a safe and simple rental platform. Customers can find the equipment they need without buying it, and owners can earn money from equipment they are not using.
 
-To learn more about Next.js, take a look at the following resources:
+## Key Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### General
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Fully responsive design for mobile, tablet and desktop
+- Dark mode and light mode with a theme toggle (saved in local storage)
+- Smooth animations using Framer Motion
+- Loading, error and 404 pages
 
-## Deploy on Vercel
+### Authentication and Authorization
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Register and login with email and password
+- Google and Facebook social login
+- Password rules: at least 8 characters, one uppercase letter, one lowercase letter and one number
+- Show and hide password button
+- JWT based authentication using BetterAuth
+- Role based access control with three roles: Customer, Owner and Admin
+- Custom Express middlewares: `verifyToken`, `verifyRenter`, `verifyOwner` and `verifyAdmin`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Home Page
+
+- Animated banner
+- Featured equipment (6 approved items, using MongoDB limit)
+- Popular categories
+- How it works
+- Why choose us
+- Customer reviews
+- Become an owner section
+
+### All Equipment Page
+
+- Shows only approved equipment in a 3 column grid
+- Search by equipment name or location
+- Filter by category, rental type, price range and availability
+- Sort by price (low to high, high to low) and recently added
+- All search, filter and sorting is done on the server
+- Pagination
+
+### Booking and Payment
+
+- Booking modal with start date, end date, quantity, contact number, delivery address and notes
+- Total price is calculated on the server, not trusted from the browser
+- Real availability check that removes quantity already booked on overlapping dates
+- Stripe Checkout payment
+- Booking and payment records are saved after successful payment
+- Stripe webhook as a backup to confirm payments
+- Payment success and cancel pages
+
+### Customer Dashboard
+
+- My Rentals table
+- Favorites
+- Profile (view and edit)
+
+### Owner Dashboard
+
+- Add equipment
+- My equipment
+- My equipment rentals
+- Analytics with total equipment, completed rentals, total earnings and monthly earnings chart
+- Profile (view and edit)
+
+### Admin Dashboard
+
+- Analytics with total users, total equipment, total bookings, total revenue, pending approvals, completed rentals and monthly charts
+- Approve or reject equipment
+- Manage users and roles
+- View all rentals
+- Profile (view and edit)
+
+## Technologies Used
+
+**Client**
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- BetterAuth
+
+**Server**
+
+- Node.js
+- Express.js
+- MongoDB
+- Stripe
+
+## npm Packages
+
+### Client
+
+- `next`
+- `react`
+- `typescript`
+- `tailwindcss`
+- `shadcn` (shadcn/ui components)
+- `better-auth`
+- `mongodb`
+- `framer-motion`
+- `next-themes`
+- `lucide-react`
+- `react-icons`
+- `sonner`
+- `recharts`
+
+### Server
+
+- `express`
+- `cors`
+- `dotenv`
+- `mongodb`
+- `jose`
+- `stripe`
+
+## Test Payment Card
+
+Use this Stripe test card to try the payment:
+
+- Card number: `4242 4242 4242 4242`
+- Expiry: any future date
+- CVC: any 3 digits
+
+## Author
+
+Ashraf Mia
+
+- GitHub: https://github.com/Ashraf-Mia
+- LinkedIn: www.linkedin.com/in/ashraf-mia-795b09443
