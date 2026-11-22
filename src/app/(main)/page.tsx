@@ -2,6 +2,7 @@ import Banner from "@/components/home/banner";
 import Categories from "@/components/home/categories";
 import FeaturedEquipment from "@/components/home/featured-equipment";
 import HowItWorks from "@/components/home/how-it-works";
+import OwnerCta from "@/components/home/owner-cta";
 import Reviews from "@/components/home/reviews";
 import WhyChooseUs from "@/components/home/why-choose-us";
 import React from "react";
@@ -15,6 +16,7 @@ const HomePage = () => {
       <HowItWorks />
       <WhyChooseUs />
       <Reviews />
+      <OwnerCta />
     </div>
   );
 };
