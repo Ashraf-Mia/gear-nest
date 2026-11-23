@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +13,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-// import { calculateTotal, createCheckoutSession } from "@/lib/booking-api";
-import { TEquipment } from "@/types";
-import { calculateTotal, createCheckoutSession } from "@/lib/api/booking-api";
-// import type { Equipment } from "@/types";
+import {
+  calculateTotal,
+  createCheckoutSession,
+  getEquipmentAvailability,
+} from "@/lib/api/booking-api";
+import type { TEquipment, TEquipmentAvailability } from "@/types";
 
 type Props = {
   item: TEquipment;
@@ -24,11 +26,22 @@ type Props = {
   onOpenChange: (open: boolean) => void;
 };
 
+type TAvailabilityResult = {
+  key: string;
+  data?: TEquipmentAvailability;
+  error?: string;
+};
+
 export default function BookingModal({ item, open, onOpenChange }: Props) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [loading, setLoading] = useState(false);
+
+  // Total stock is not enough: bookings for the same dates may already have
+  // taken some units, so the server returns the real remaining quantity.
+  const [availabilityResult, setAvailabilityResult] =
+    useState<TAvailabilityResult | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -39,6 +52,48 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
     endDate,
     Number(quantity),
   );
+
+  const requestKey = `${item._id}|${startDate}|${endDate}`;
+  const areDatesValid = Boolean(
+    open && startDate && endDate && endDate >= startDate,
+  );
+  const isCurrent = areDatesValid && availabilityResult?.key === requestKey;
+
+  const availability = isCurrent ? (availabilityResult?.data ?? null) : null;
+  const availabilityError = isCurrent
+    ? (availabilityResult?.error ?? "")
+    : "";
+  const isCheckingAvailability = areDatesValid && !isCurrent;
+
+  useEffect(() => {
+    if (!open || !startDate || !endDate || endDate < startDate) return;
+
+    let isCancelled = false;
+
+    getEquipmentAvailability(item._id, startDate, endDate)
+      .then((data) => {
+        if (!isCancelled) setAvailabilityResult({ key: requestKey, data });
+      })
+      .catch((cause) => {
+        if (isCancelled) return;
+
+        setAvailabilityResult({
+          key: requestKey,
+          error:
+            cause instanceof Error
+              ? cause.message
+              : "Could not check availability for these dates.",
+        });
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [open, item._id, startDate, endDate, requestKey]);
+
+  const maxQuantity = availability
+    ? availability.availableQuantity
+    : item.availableQuantity;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,15 +107,30 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
 
     const qty = Number(quantity);
 
+    if (!startDate || !endDate) {
+      return toast.error("Please select the rental dates");
+    }
+
     if (endDate < startDate) {
       return toast.error("End date must be after start date");
     }
 
-    if (qty < 1 || qty > item.availableQuantity) {
+    if (isCheckingAvailability) {
+      return toast.info("Checking availability, please wait");
+    }
+
+    if (!availability) {
+      return toast.error(availabilityError || "Could not check availability");
+    }
+
+    if (qty < 1 || qty > availability.availableQuantity) {
       return toast.error(
-        `Quantity must be between 1 and ${item.availableQuantity}`,
+        availability.availableQuantity < 1
+          ? "Fully booked for these dates. Please choose other dates."
+          : `Only ${availability.availableQuantity} unit(s) available for these dates`,
       );
     }
+
     if (!/^[0-9+\-\s]{7,15}$/.test(extra.contact)) {
       return toast.error("Enter a valid contact number");
     }
@@ -86,6 +156,8 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
       setLoading(false);
     }
   };
+
+  const isFullyBooked = availability !== null && availability.availableQuantity < 1;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,6 +196,28 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
             </div>
           </div>
 
+          {startDate && endDate && endDate >= startDate && (
+            <p
+              role="status"
+              aria-live="polite"
+              className={
+                isFullyBooked || availabilityError
+                  ? "text-sm text-destructive"
+                  : "text-sm text-muted-foreground"
+              }
+            >
+              {isCheckingAvailability
+                ? "Checking availability for these dates..."
+                : availabilityError
+                  ? availabilityError
+                  : availability
+                    ? isFullyBooked
+                      ? "Fully booked for these dates. Please choose other dates."
+                      : `${availability.availableQuantity} of ${availability.totalQuantity} units available for these dates.`
+                    : ""}
+            </p>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="quantity">Required Quantity</Label>
@@ -131,7 +225,7 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
                 id="quantity"
                 type="number"
                 min={1}
-                max={item.availableQuantity}
+                max={Math.max(maxQuantity, 1)}
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 required
@@ -178,7 +272,13 @@ export default function BookingModal({ item, open, onOpenChange }: Props) {
           <Button
             type="submit"
             className="h-11 w-full"
-            disabled={loading || total === 0}
+            disabled={
+              loading ||
+              total === 0 ||
+              isCheckingAvailability ||
+              !availability ||
+              isFullyBooked
+            }
           >
             {loading ? "Redirecting to payment..." : "Confirm & Pay"}
           </Button>

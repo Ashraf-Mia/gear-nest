@@ -7,6 +7,7 @@ import { ArrowLeft, Heart, Loader2, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 
 import DeleteEquipmentDialog from "@/components/equipment/delete-equipment-dialog";
+import AvailabilityChecker from "@/components/equipment/availability-checker";
 import EquipmentDetails from "@/components/equipment/equipment-details";
 import UpdateEquipmentDialog from "@/components/equipment/update-equipment-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -35,6 +36,9 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  // Bumped on every open so the modal remounts with fresh dates and a fresh
+  // availability check instead of reusing numbers from an earlier session.
+  const [bookingSession, setBookingSession] = useState(0);
 
   const [favorite, setFavorite] = useState<{
     equipmentId: string;
@@ -227,6 +231,12 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
 
       <EquipmentDetails equipment={equipment} />
 
+      {/* Total stock alone can be misleading once the same dates are booked by
+          someone else, so show the real remaining units for a date range. */}
+      {equipment.status === "approved" && (
+        <AvailabilityChecker equipmentId={equipment._id} />
+      )}
+
       {equipment.status !== "approved" && (isOwner || isAdmin) && (
         <Card>
           <CardContent>
@@ -302,7 +312,10 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
 
                     <Button
                       type="button"
-                      onClick={() => setBookingOpen(true)}
+                      onClick={() => {
+                        setBookingSession((session) => session + 1);
+                        setBookingOpen(true);
+                      }}
                       disabled={equipment.availableQuantity < 1}
                     >
                       Book Now
@@ -319,6 +332,7 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
         </CardContent>
       </Card>
       <BookingModal
+        key={bookingSession}
         item={equipment}
         open={bookingOpen}
         onOpenChange={setBookingOpen}

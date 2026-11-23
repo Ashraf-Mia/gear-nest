@@ -185,7 +185,7 @@ Status key: ✅ done · 🟡 partial/needs hardening · ❌ missing · ⚠️ ne
 | Details page | All required equipment + owner + terms info | ✅ | `components/equipment/equipment-details.tsx` |
 | Details privacy | Brief lists this as a **private route** | ⚠️ | Currently public; guests can open a direct URL |
 | Favorites | Add/remove on details, persisted, shown in dashboard | ✅ | Heart button on details (optimistic toggle + revert on error), `GET /favorites` list, `GET /favorites/check`, `POST /favorites/toggle`, `DELETE /favorites/:equipmentId` |
-| Book Now modal | Dates, quantity, contact, address, notes | ✅ | Opens from details page; live total; sends to Stripe Checkout |
+| Book Now modal | Dates, quantity, contact, address, notes | ✅ | Opens from details page; live total; date-range availability from `GET /equipment/:id/availability` caps quantity (overlapping bookings subtracted); server re-checks at checkout and after payment; sends to Stripe Checkout |
 | Payment | Stripe checkout + success page + payment record | 🟡 | Checkout, success/cancel pages, confirm route, and `/webhook` implemented; needs a live Stripe test-key run |
 
 ### 3.3 Customer dashboard
@@ -341,6 +341,7 @@ Define once and use on both client (preview) and server (charge):
 | GET | `/equipment/my` | Owner | Owner's own equipment | ✅ |
 | POST | `/equipment` | **should be Owner** | Create with `status: pending` | ⚠️ currently public; client sends no token |
 | GET | `/equipment/:id` | Public + optional token | Details; unapproved visible only to owner/admin | 🟡 brief wants private |
+| GET | `/equipment/:id/availability?startDate=&endDate=` | Public | Real remaining units for a date range (stock minus every booking that overlaps those dates) | ✅ |
 | PATCH | `/equipment/:id` | Owner/Admin | Update name/category/rentalPrice/availableQuantity | ⚠️ admin blocked |
 | DELETE | `/equipment/:id` | Owner/Admin | Delete own/any equipment | ⚠️ admin blocked |
 | PATCH | `/equipment/:id/status` | Admin | Approve/reject | ✅ |

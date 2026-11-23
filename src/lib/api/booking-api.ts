@@ -1,6 +1,6 @@
 // import { API_URL, getToken } from "@/lib/api";
 
-import { TBooking } from "@/types";
+import { TBooking, TEquipmentAvailability } from "@/types";
 import { getTokenFromClient } from "../getTokenFromClient";
 import { API_URL } from "./config";
 
@@ -26,6 +26,28 @@ export function calculateTotal(
   if (type === "monthly") units = Math.ceil(days / 30);
 
   return price * units * quantity;
+}
+
+// Real availability for a date range. The equipment details page and the
+// booking modal both use this so overlapping bookings reduce the shown stock.
+export async function getEquipmentAvailability(
+  equipmentId: string,
+  startDate: string,
+  endDate: string,
+): Promise<TEquipmentAvailability> {
+  const params = new URLSearchParams({ startDate, endDate });
+
+  const response = await fetch(
+    `${API_URL}/equipment/${equipmentId}/availability?${params.toString()}`,
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Could not check availability.");
+  }
+
+  return result as TEquipmentAvailability;
 }
 
 type CheckoutData = {
