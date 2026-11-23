@@ -211,7 +211,7 @@ Status key: ✅ done · 🟡 partial/needs hardening · ❌ missing · ⚠️ ne
 | Route | Requirement | Status |
 |---|---|---|
 | `/dashboard/admin/users` | All users (name, email, role, registration date), change role, manage | ❌ placeholder; no role-change API |
-| `/dashboard/admin/equipment` | All equipment, approve/reject/update/delete | ❌ placeholder; status API exists, update/delete admin access missing |
+| `/dashboard/admin/equipment` | All equipment, approve/reject/update/delete | ✅ table lists every status with details, approve, reject, update, and delete actions |
 | `/dashboard/admin/rentals` | All rentals with customer, owner, equipment, duration, amount, statuses | ❌ placeholder |
 | `/dashboard/admin/profile` | Profile edit | ❌ placeholder |
 | `/dashboard/admin/analytics` | Users, equipment, bookings, pending approvals, completed rentals, revenue, monthly bookings | ❌ placeholder |
@@ -342,8 +342,8 @@ Define once and use on both client (preview) and server (charge):
 | POST | `/equipment` | **should be Owner** | Create with `status: pending` | ⚠️ currently public; client sends no token |
 | GET | `/equipment/:id` | Public + optional token | Details; unapproved visible only to owner/admin | 🟡 brief wants private |
 | GET | `/equipment/:id/availability?startDate=&endDate=` | Public | Real remaining units for a date range (stock minus every booking that overlaps those dates) | ✅ |
-| PATCH | `/equipment/:id` | Owner/Admin | Update name/category/rentalPrice/availableQuantity | ⚠️ admin blocked |
-| DELETE | `/equipment/:id` | Owner/Admin | Delete own/any equipment | ⚠️ admin blocked |
+| PATCH | `/equipment/:id` | Owner/Admin | Update name/category/rentalPrice/availableQuantity | ✅ |
+| DELETE | `/equipment/:id` | Owner/Admin | Delete own/any equipment | ✅ |
 | PATCH | `/equipment/:id/status` | Admin | Approve/reject | ✅ |
 | GET | `/profile` | Any authenticated | Current user | 🟡 returns raw user document; restrict fields |
 | GET | `/users` | Admin | All users | 🟡 strip sensitive fields; pagination optional |
@@ -688,7 +688,7 @@ These are confirmed from the audit and should be treated as work items:
 3. Navbar "Profile" links to `/#` instead of the role's profile page.
 4. Equipment details is public; the brief lists it as private.
 5. `POST /equipment` has no auth middleware and the client does not send a token.
-6. Admin cannot update/delete equipment because `verifyOwner` runs first.
+6. ✅ Fixed — admins can now update/delete any equipment (`verifyOwnerOrAdmin`), and owners are still limited to their own records.
 7. `GET /profile` returns the raw user document; project only safe fields.
 8. Dashboard sub-routes are unguarded; `/dashboard` only redirects client-side.
 9. Register password rule is stricter than the brief (8 + digit vs 6 + upper/lower) and the placeholder copy is misleading; an allowed 6-character password is rejected. Align the client rule, Better Auth `minPasswordLength`, and the copy.

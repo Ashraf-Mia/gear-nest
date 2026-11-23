@@ -21,6 +21,9 @@ import {
 } from "@/lib/api/admin";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { formatPrice, getRentalPeriod } from "@/lib/format";
+import DeleteEquipmentDialog from "@/components/equipment/delete-equipment-dialog";
+import UpdateEquipmentDialog from "@/components/equipment/update-equipment-dialog";
 // import {
 //   getAllEquipmentForAdmin,
 //   updateEquipmentStatus,
@@ -62,6 +65,17 @@ export default function AdminEquipmentPage() {
     }
   };
 
+  // The update dialog applies an optimistic copy first, then the saved record.
+  const handleUpdated = (updated: TEquipment) => {
+    setItems((prev) =>
+      prev.map((item) => (item._id === updated._id ? updated : item)),
+    );
+  };
+
+  const handleDeleted = (id: string) => {
+    setItems((prev) => prev.filter((item) => item._id !== id));
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold">All Equipment</h1>
@@ -100,7 +114,8 @@ export default function AdminEquipmentPage() {
                     <TableCell>{item.category}</TableCell>
                     <TableCell>{item.ownerName}</TableCell>
                     <TableCell>
-                      ${item.price} / {item.rentalType}
+                      {formatPrice(item.rentalPrice)} /{" "}
+                      {getRentalPeriod(item.rentalType)}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -110,7 +125,7 @@ export default function AdminEquipmentPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/equipment/${item._id}`}
                           className={buttonVariants({
@@ -141,6 +156,14 @@ export default function AdminEquipmentPage() {
                         >
                           <X className="size-4" /> Reject
                         </Button>
+                        <UpdateEquipmentDialog
+                          equipment={item}
+                          onUpdated={handleUpdated}
+                        />
+                        <DeleteEquipmentDialog
+                          equipment={item}
+                          onDeleted={handleDeleted}
+                        />
                       </div>
                     </TableCell>
                   </TableRow>

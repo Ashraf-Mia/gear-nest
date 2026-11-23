@@ -282,6 +282,15 @@ export default function EquipmentDetailsClient({ id }: { id: string }) {
               >
                 Reject
               </Button>
+              <UpdateEquipmentDialog
+                equipment={equipment}
+                onUpdated={setEquipment}
+                label="Edit"
+              />
+              <DeleteEquipmentDialog
+                equipment={equipment}
+                onDeleted={() => router.push("/dashboard/admin/equipment")}
+              />
             </>
           )}
 
