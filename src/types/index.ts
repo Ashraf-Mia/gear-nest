@@ -48,9 +48,6 @@ export type EquipmentResponse = {
   totalPages: number;
 };
 
-// Response from GET /equipment/:id/availability. `availableQuantity` is the
-// real remaining stock for the requested dates: total minus every booking that
-// overlaps those dates.
 export type TEquipmentAvailability = {
   equipmentId: string;
   startDate: string;
